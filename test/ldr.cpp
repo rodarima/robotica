@@ -11,13 +11,19 @@ Description: This sketch will make the arduino read Photo resistor
 */
 #include <Arduino.h>
 
+int led_azul = 13;
 int photoRPin = 0; 
 int minLight;          //Used to calibrate the readings
 int maxLight;          //Used to calibrate the readings
 int lightLevel;
 int adjustedLightLevel;
 
+#define SLEEP 100
+
 void setup() {
+
+	pinMode(led_azul, OUTPUT);
+
 	Serial.begin(9600);
 
 	//Setup the starting light level limits
@@ -26,24 +32,33 @@ void setup() {
 	maxLight=lightLevel;
 }
 
-void loop(){
-	//auto-adjust the minimum and maximum limits in real time
-	lightLevel=analogRead(photoRPin);
-	if(minLight>lightLevel){
-		minLight=lightLevel;
-	}
-	if(maxLight<lightLevel){
-		maxLight=lightLevel;
-	}
+void loop()
+{
+	int r0, r1, dif;
+	
+	digitalWrite(led_azul, LOW);
+	
+	delay(SLEEP);
+	r0 = analogRead(photoRPin);
+	
+	digitalWrite(led_azul, HIGH);
+	delay(SLEEP);
+	
+	r1 = analogRead(photoRPin);
+	
+	dif = r0 - r1;
 
-	//Adjust the light level to produce a result between 0 and 100.
-	adjustedLightLevel = map(lightLevel, minLight, maxLight, 0, 100); 
-
-	//Send the adjusted Light level result to Serial port (processing)
-	//Serial.println(adjustedLightLevel);
 	Serial.print("Real value: ");
-	Serial.println(lightLevel);
+	Serial.println(r0);
+	if(dif >= 100)
+	{
+		Serial.print(dif);
+		Serial.println(" Alerta de colisión");
+	}
+	else
+	{
+		Serial.println(dif);
+	}
 
-	//slow down the transmission for effective Serial communication.
-	delay(50);
+
 }

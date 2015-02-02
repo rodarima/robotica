@@ -38,8 +38,8 @@ UPLOAD_RATE = $(shell grep '$(BOARD).upload.speed' $(BOARDS_TXT) | sed 's/[^=]*=
 AVRDUDE_FORMAT=:i
 
 # Arduino libraries version and path to sources and headers
-ARDUINO_VERSION = 23
-ARDUINO_SRC = /usr/share/arduino/hardware/arduino/cores/$(CORE) /usr/share/arduino/hardware/arduino/variants/$(VARIANT)
+ARDUINO_VERSION = 100
+ARDUINO_SRC = /usr/share/arduino/hardware/arduino/cores/$(CORE) /usr/share/arduino/hardware/arduino/variants/$(VARIANT) /usr/share/arduino/libraries/SoftwareSerial /usr/share/arduino/libraries/AltSoftSerial /usr/share/arduino/libraries/TimerOne
 # ... insert additional libs here ^^^, for example, /usr/share/arduino/libraries/EEPROM
 
 # Tools
@@ -73,8 +73,8 @@ CINCS = $(shell for path in $(ARDUINO_LOCAL_SRC); do echo -n "-I$$path "; done) 
 CXXINCS = $(shell for path in $(ARDUINO_LOCAL_SRC); do echo -n "-I$$path "; done) -I./
 
 # Compiler and linker options from Arduino IDE
-CFLAGS = -g -Os -w -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CDEFS) $(CINCS)
-CXXFLAGS = -g -Os -w -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CXXDEFS) $(CXXINCS)
+CFLAGS = -g -fno-use-cxa-atexit -Os -w -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CDEFS) $(CINCS)
+CXXFLAGS = -g -fno-use-cxa-atexit -Os -w -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CXXDEFS) $(CXXINCS)
 LDFLAGS = -Wl,--gc-section
 
 
