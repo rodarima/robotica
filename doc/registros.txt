@@ -1,0 +1,155 @@
+Nombre	Bits	Descripción
+TIMSK1	8	Timer/Counter1 Interrupt Mask Register
+OCR1A		Output Compare Register for Timer1
+ICR1	16	Input Compare Register for Timer1
+
+
+12.2.1	EICRA - External Interrupt Control Register A
+-----------------------------------------------------
+
+           7       6       5       4       3       2       1       0
+EICRA: [       |       |       |       | ISC11 | ISC10 | ISC01 | ISC00 ]
+
+ISC11	ISC10	Description
+0	0	The low level of INT1 generates an interrupt request.
+0	1	Any logical change on INT1 generates an interrupt request.
+1	0	The falling edge of INT1 generates an interrupt request.
+1	1	The rising edge of INT1 generates an interrupt request.
+
+ISC01	ISC00	Description
+0	0	The low level of INT0 generates an interrupt request.
+0	1	Any logical change on INT0 generates an interrupt request
+1	0	The falling edge of INT0 generates an interrupt request.
+1	1	The rising edge of INT0 generates an interrupt request.
+
+
+12.2.2	EIMSK - External Interrupt Mask Register
+------------------------------------------------
+
+           7       6       5       4       3       2       1       0
+EIMSK: [       |       |       |       |       |       | INT1  | INT0  ]
+
+INT1	Description
+0	External pin interrupt 1 is enabled
+1	External pin interrupt 1 is disabled
+
+INT0	Description
+0	External pin interrupt 0 is enabled
+1	External pin interrupt 0 is disabled
+
+
+12.2.3	EIFR – External Interrupt Flag Register
+-----------------------------------------------
+
+          7       6       5       4       3       2       1       0
+EIFR: [       |       |       |       |       |       | INTF1 | INTF0 ]
+
+INTF1	Description
+0	Default
+1	When an edge or logic change on the INT1 pin triggers an interrupt request.
+
+INTF0	Description
+0	Default
+1	When an edge or logic change on the INT0 pin triggers an interrupt request.
+
+
+12.2.4	PCICR – Pin Change Interrupt Control Register
+-----------------------------------------------------
+
+           7       6       5       4       3       2       1       0
+PCICR: [       |       |       |       |       | PCIE2 | PCIE1 | PCIE0 ]
+
+When the PCIE2 bit is 1, pin change interrupt 2 is enabled.
+Any change on any enabled PCINT23..16 pin will cause an interrupt. PCINT23..16 
+pins are enabled individually by the PCMSK2 Register.
+
+When the PCIE1 bit is 1, pin change interrupt 1 is enabled.
+Any change on any enabled PCINT14..8 pin will cause an interrupt. PCINT14..8 
+pins are enabled individually by the PCMSK1 Register.
+
+When the PCIE0 bit is 1, pin change interrupt 0 is enabled.
+Any change on any enabled PCINT7..0 pin will cause an interrupt. PCINT7..0 pins 
+are enabled individually by the PCMSK0 Register.
+
+
+12.2.5	PCIFR – Pin Change Interrupt Flag Register
+--------------------------------------------------
+
+	   7       6       5       4       3       2       1       0
+PCIFR: [       |       |       |       |       | PCIF2 | PCIF1 | PCIF0 ]
+
+PCIF2:
+When a logic change on any PCINT23..16 pin triggers an interrupt request, PCIF2 
+becomes set (one). If the I-bit in SREG and the PCIE2 bit in PCICR are set 
+(one), the MCU will jump to the corresponding Interrupt Vector. The flag is 
+cleared when the interrupt routine is executed. Alternatively, the flag can be 
+cleared by writing a logical one to it.
+
+PCIF1:
+When a logic change on any PCINT15..8 pin triggers an interrupt request, PCIF1 
+becomes set (one). If the I-bit in SREG and the PCIE1 bit in PCICR are set 
+(one), the MCU will jump to the corresponding Interrupt Vector. The flag is 
+cleared when the interrupt routine is executed. Alternatively, the flag can be 
+cleared by writing a logical one to it.
+
+PCIF0:
+When a logic change on any PCINT7..0 pin triggers an interrupt request, PCIF0 
+becomes set (one). If the I-bit in SREG and the PCIE0 bit in PCICR are set 
+(one), the MCU will jump to the corresponding Interrupt Vector. The flag is 
+cleared when the interrupt routine is executed. Alternatively, the flag can be 
+cleared by writing a logical one to it.
+
+
+12.2.6	PCMSK2 – Pin Change Mask Register 2
+-------------------------------------------
+
+	    7        6        5        4        3        2        1        0
+PCMSK2: [PCINT23 |PCINT22 |PCINT21 |PCINT20 |PCINT19 |PCINT18 |PCINT17 |PCINT16]
+
+
+12.2.7	PCMSK1 – Pin Change Mask Register 1
+-------------------------------------------
+
+	    7        6        5        4        3        2        1        0
+PCMSK1: [   -    |PCINT14 |PCINT13 |PCINT12 |PCINT11 |PCINT10 | PCINT9 | PCINT8]
+
+
+12.2.8	PCMSK0 – Pin Change Mask Register 0
+-------------------------------------------
+
+	    7        6        5        4        3        2        1        0
+PCMSK0: [ PCINT7 | PCINT6 | PCINT5 | PCINT4 | PCINT3 | PCINT2 | PCINT1 | PCINT0]
+
+
+17.	8-bit Timer/Counter2 with PWM and Asynchronous Operation
+================================================================
+
+17.11 Register Description
+
+17.11.1	TCCR2A – Timer/Counter Control Register A
+-------------------------------------------------
+	    7        6        5        4        3        2        1        0
+TCCR2A: [ COM2A1 | COM2A0 | COM2B1 | COM2B0 |   -    |   -    |  WGM21 | WGM20 ]
+
+Compare Output Mode, non-PWM Mode:
+
+	COM2A1	COM2A0	Description
+	0	0	Normal port operation, OC0A disconnected.
+	0	1	Toggle OC2A on Compare Match.
+	1	0	Clear OC2A on Compare Match.
+	1	1	Set OC2A on Compare Match.
+
+Compare Output Mode, Fast PWM Mode:
+	COM2A1	COM2A0	Description
+	0	0	Normal port operation, OC2A disconnected.
+	0	1	WGM22 = 0: Normal Port Operation, OC0A Disconnected.
+			WGM22 = 1: Toggle OC2A on Compare Match.
+	1	0	Clear OC2A on Compare Match, set OC2A at BOTTOM,
+			(non-inverting mode)
+	1	1	Set OC2A on Compare Match, set OC2A at BOTTOM,
+			(inverting mode)
+
+
+The standard Arduino has 3 timers, timer0 is 8 bit and used for the millis() and 
+micros() functions. Timer1 is 16 bit and not used by default, timer2 is another 
+8 bit timer like timer0 but not used by default.
