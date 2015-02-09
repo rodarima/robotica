@@ -1,7 +1,6 @@
 #include <Arduino.h>
 
-static volatile uint8_t rx_time0;
-static volatile uint8_t rx_time1;
+static volatile unsigned long rx_time;
 static volatile uint16_t cancer;
 static volatile uint8_t go0 = 0;
 
@@ -19,28 +18,27 @@ void handle_bit()
 {
 	//cli();
 	
-	uint16_t t = (rx_time1<<8) | rx_time0;
-	uint16_t diff_time = micros() - t;
+	unsigned long diff_time = micros() - rx_time;
 
 	
 	//Serial.print("TIME:");
-	Serial.print(t);
-	Serial.print(" ");
-	Serial.print(diff_time);
-	Serial.print(" ");
-	Serial.print((unsigned long)TCNT2);
-	Serial.print(" ");
-	Serial.print(TIFR2, HEX);
-	Serial.print(" ");
-	Serial.print(cancer);
+	//Serial.print(F_CPU);
+	//Serial.print(" ");
+	//Serial.print(diff_time);
+	//Serial.print(" ");
+	//Serial.print(TCNT2);
+	//Serial.print(" ");
+	//Serial.print(TIFR2, HEX);
+	//Serial.print(" ");
+	//Serial.print(cancer);
 
 	//Serial.print(" TCNT1:");
 	//Serial.print((unsigned long)TCNT1);
 	//Serial.print(" TIFR1:");
 	//Serial.print(TIFR1, HEX);
-	Serial.print("\n");
-	if((diff_time > 1249-500) &&
-		(diff_time < 1249+20))
+	//Serial.print("\n");
+	if((diff_time > 1249+20) ||
+		(diff_time < 1249-20))
 		err();
 	
 	go0 = 0;
@@ -66,10 +64,8 @@ void handle_interrupt()
 
 	detachInterrupt(0);
 	
-	uint16_t t = micros();
-	rx_time0 = t & 0xff;
-	rx_time1 = (t>>8) & 0xff;
-	cancer = 60001;
+	rx_time = micros();
+	//cancer = 60001;
 
 	/*
 	TCCR1B = 0; //Stop timer1
@@ -114,21 +110,41 @@ void handle_interrupt()
 
 	//    Set timer2 in overflow mode
 	
-	//Stop timer2
-	TCCR2B = 0; //Stop timer2
-	TIMSK2 = 0;
-
-	ASSR &= ~(1<<AS2);
+	//Disable timer2 overflow interrupt
+	//TIMSK2 &= ~_BV(TOIE2);
+	//TIMSK2 = 0;
 	
+	// Set normal mode using WGM*
+	//TCCR2B &= ~_BV(WGM22);
+	//TCCR2A &= ~(_BV(WGM21) | _BV(WGM20));
+	TCCR2B = 0;
+	TCCR2A = 0;
+	TIMSK2 = 0;
+	
+	//Set source clock I/O clk 17.11.8
+	//ASSR &= ~_BV(AS2);
+	
+	// Set Timer2 mask to overflow
+	//TIMSK2 &= ~_BV(OCIE2A);
+
+	TCCR2B = _BV(CS22) | _BV(CS20);
+
 	//Set timer2 value
-	TCNT2 = 200;
+	TCNT2 = 256-156;
+	TIMSK2 = (1<<TOIE2);
 
 	//Set prescaler to 128
-	TCCR2B = _BV(CS22);
+	//TCCR2B |= _BV(CS22) | _BV(CS20);
+	//TCCR2B &= ~_BV(CS21);
+	TCCR2B = _BV(CS22) | _BV(CS20);
 
-	TIFR2 = 0xff;
-	// Set Timer2 mask to overflow
-	TIMSK2 = _BV(TOIE2);
+	//Clear previous interrupts
+	//TIFR2 |= _BV(OCF2B) | _BV(OCF2A) | _BV(TOV2);
+	TIFR2 = _BV(OCF2B) | _BV(OCF2A) | _BV(TOV2);
+	//TIFR2 = 0xff;
+
+
+
 
 	sei();
 
@@ -150,7 +166,9 @@ void timer2()
 	//Set prescaler to 128
 	TCCR2B = _BV(CS22);
 
-	TIFR2 = 0xff;
+	//Clear previous interrupts
+	TIFR2 = _BV(OCF2B) | _BV(OCF2A) | _BV(TOV2);
+
 	// Set Timer2 mask to overflow
 	TIMSK2 = _BV(TOIE2);
 }
@@ -158,7 +176,8 @@ void timer2()
 ISR(TIMER2_OVF_vect)
 {
 	TCCR2B = 0; //Stop timer1
-	TIMSK2 = 0;
+	TIMSK2 &= ~(1<<TOIE2);
+	/*
 	if(!att)
 	{
 		att++;
@@ -168,6 +187,8 @@ ISR(TIMER2_OVF_vect)
 	{
 		handle_bit();
 	}
+	*/
+	handle_bit();
 }
 
 void setup()  
@@ -178,7 +199,8 @@ void setup()
 
 	digitalWrite(13, LOW);
 	Serial.begin(115200);
-	timer2();
+	//timer2();
+	attachInterrupt(0, handle_interrupt, CHANGE);
 }
 
 void loop()
