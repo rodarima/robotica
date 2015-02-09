@@ -114,8 +114,7 @@ void handle_bit()
 		(diff_time > 1249+20) ||
 		(diff_time < 1249-20)))
 	{
-		//err();
-		Serial.println(diff_time);
+		err();
 	}
 	
 	/*
@@ -165,11 +164,6 @@ void handle_interrupt()
 {
 	detachInterrupt(0);
 
-	if(rx_start_count == 0)
-	{
-		rx_time = micros();
-	}
-
 	if(rx_start_count < 4)
 	{
 		if(!digitalRead(2))
@@ -185,8 +179,6 @@ void handle_interrupt()
 		rx_start_count++;
 	}
 	
-	rx_start_count = 0;
-	
 	
         //EIMSK &= ~(1<<INT0);
 	
@@ -200,6 +192,7 @@ void handle_interrupt()
 	*/
 	
 
+	rx_time = micros();
 
 	//timer2_init(100, 5, handle_bit);
 	//timer2_init(100, 5, handle_bit);
@@ -282,12 +275,11 @@ void setup()
 	
 	Serial.begin(115200);
 
-/*
 	digitalWrite(PINMR0, 0);
 	digitalWrite(PINMR1, 1);
 	digitalWrite(PINML0, 0);
 	digitalWrite(PINML1, 1);
-*/
+
 	myinit(0);
 	go0 = 1;
 }
@@ -308,16 +300,61 @@ void loop()
 		x += (long)((signed char) (((c[0] & 0x03) << 6) | (c[1] & 0x7f)));
 		y += (long)(- (signed char) (((c[0] & 0x0C) << 4) | (c[2] & 0x7f)));
 
-/*
-		Serial.print(c[0], HEX);
-		Serial.print(" ");
-		Serial.print(c[1], HEX);
-		Serial.print(" ");
-		Serial.println(c[2], HEX);
-*/
-
-		//Serial.print(x);
+		//Serial.print(c[0], HEX);
 		//Serial.print(" ");
-		//Serial.println(y);
+		//Serial.print(c[1], HEX);
+		//Serial.print(" ");
+		//Serial.println(c[2], HEX);
+
+		Serial.print(x);
+		Serial.print(" ");
+		Serial.println(y);
+	}
+	if(avanzar)
+	{
+		digitalWrite(PINML0, 0);
+		digitalWrite(PINMR0, 0);
+
+		if(y<-10)
+			digitalWrite(PINML1, 0);
+		else
+			digitalWrite(PINML1, 1);
+
+		if(y>10)
+			digitalWrite(PINMR1, 0);
+		else
+			digitalWrite(PINMR1, 1);
+	}
+	else
+	{
+			digitalWrite(PINML0, 0);
+			digitalWrite(PINML1, 0);
+			digitalWrite(PINMR0, 0);
+			digitalWrite(PINMR1, 0);
+	}
+
+
+	long tiempo = micros();
+	
+	digitalWrite(PINSE, 0);
+	delayMicroseconds(5);
+	digitalWrite(PINSE, 1);
+	delayMicroseconds(10);
+
+	tiempo = pulseIn(PINSR, HIGH); /* Función para medir la longitud del pulso entrante. Mide el tiempo que transcurrido entre el envío
+				    del pulso ultrasónico y cuando el sensor recibe el rebote, es decir: desde que el pin 12 empieza a recibir el rebote, HIGH, hasta que
+				    deja de hacerlo, LOW, la longitud del pulso entrante*/
+	int distancia0 = int(0.017*tiempo); /*fórmula para calcular la distancia obteniendo un valor entero*/
+	if(distancia0 != distancia)
+	{
+		distancia = distancia0;
+		/*Monitorización en centímetros por el monitor serial*/
+		//Serial.print("Distancia ");
+		//Serial.print(distancia);
+		//Serial.println(" cm");
+		if(distancia < 10)
+			avanzar = 0;
+		else
+			avanzar = 1;
 	}
 }
