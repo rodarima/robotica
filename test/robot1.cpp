@@ -103,6 +103,8 @@ void handle_last_bit()
 	//uint8_t bit = digitalRead(2);
 	//Serial.println(bit);
 	
+	rx_start_count = 0;
+
 	attachInterrupt(0, handle_interrupt, RISING);
 }
 
@@ -110,12 +112,13 @@ void handle_bit()
 {
 	uint16_t diff_time = micros() - rx_time;
 	
+	/*
 	if((rx_actual_bit == 0) && (
 		(diff_time > 1249+20) ||
 		(diff_time < 1249-20)))
 	{
 		err();
-	}
+	}*/
 	
 	/*
 	if((rx_actual_bit == 6) && (
@@ -154,7 +157,7 @@ void handle_bit()
 	}
 
 	rx_actual_bit++;
-	//Serial.println(diff_time);
+	Serial.println(diff_time);
 	
 
 	sei();
@@ -164,10 +167,20 @@ void handle_interrupt()
 {
 	detachInterrupt(0);
 
+	Serial.print("C");
+	Serial.println(rx_start_count);
+	
+	if(rx_start_count == 0)
+	{
+		rx_time = micros();
+	}
+	
 	if(rx_start_count < 4)
 	{
 		if(!digitalRead(2))
 		{
+			Serial.print("E");
+			Serial.println(rx_start_count);
 			err();
 			timer2_stop();
 			rx_start_count = 0;
@@ -176,9 +189,21 @@ void handle_interrupt()
 			return;
 		}
 		timer2_init(25, 5, handle_interrupt);
+		timer2_start();
 		rx_start_count++;
+		return;
 	}
-	
+
+	if(rx_start_count > 4)
+	{
+		err();
+		timer2_stop();
+		rx_start_count = 0;
+
+		attachInterrupt(0, handle_interrupt, RISING);
+		return;
+	}
+
 	
         //EIMSK &= ~(1<<INT0);
 	
@@ -192,7 +217,6 @@ void handle_interrupt()
 	*/
 	
 
-	rx_time = micros();
 
 	//timer2_init(100, 5, handle_bit);
 	//timer2_init(100, 5, handle_bit);
@@ -219,6 +243,7 @@ void handle_interrupt()
 
 	rx_actual_byte = 0;
 	rx_actual_bit = 0;
+
 	handle_bit();
 }
 

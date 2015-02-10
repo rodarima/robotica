@@ -175,6 +175,8 @@ void handle_interrupt()
 		if(!digitalRead(2))
 		{
 			err();
+			Serial.print("E1: ");
+			Serial.println(rx_start_count);
 			timer2_stop();
 			rx_start_count = 0;
 			
@@ -182,6 +184,7 @@ void handle_interrupt()
 			return;
 		}
 		timer2_init(25, 5, handle_interrupt);
+		timer2_start();
 		rx_start_count++;
 	}
 	
@@ -308,16 +311,16 @@ void loop()
 		x += (long)((signed char) (((c[0] & 0x03) << 6) | (c[1] & 0x7f)));
 		y += (long)(- (signed char) (((c[0] & 0x0C) << 4) | (c[2] & 0x7f)));
 
-/*
+
 		Serial.print(c[0], HEX);
 		Serial.print(" ");
 		Serial.print(c[1], HEX);
 		Serial.print(" ");
 		Serial.println(c[2], HEX);
-*/
 
-		//Serial.print(x);
-		//Serial.print(" ");
-		//Serial.println(y);
+
+		Serial.print(x);
+		Serial.print(" ");
+		Serial.println(y);
 	}
 }
