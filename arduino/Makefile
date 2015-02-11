@@ -39,7 +39,7 @@ AVRDUDE_FORMAT=:i
 
 # Arduino libraries version and path to sources and headers
 ARDUINO_VERSION = 100
-ARDUINO_SRC = /usr/share/arduino/hardware/arduino/cores/$(CORE) /usr/share/arduino/hardware/arduino/variants/$(VARIANT) ./timer2
+ARDUINO_SRC = /usr/share/arduino/hardware/arduino/cores/$(CORE) /usr/share/arduino/hardware/arduino/variants/$(VARIANT) ./timer2 ./serialmouse
 #/usr/share/arduino/libraries/AltSoftSerial /usr/share/arduino/libraries/TimerOne /usr/share/arduino/libraries/SoftwareSerial 
 # ... insert additional libs here ^^^, for example, /usr/share/arduino/libraries/EEPROM
 
