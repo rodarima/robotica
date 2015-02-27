@@ -71,6 +71,9 @@ void setup()
 
 long x = 0, y = 0;
 
+#define MAX_X 1000
+#define MAX_Y 9
+
 void loop()
 {
 	//test_motors();
@@ -80,15 +83,15 @@ void loop()
 		y = mousey;
 
 
-		if(y > 10)
+		if(y > MAX_Y)
 		{
 			if(direction)
 			{
 				
-				digitalWrite(PINMR0, 0);
+				digitalWrite(PINMR0, 1);
 				digitalWrite(PINMR1, 0);
 				digitalWrite(PINML0, 0);
-				digitalWrite(PINML1, 1);
+				digitalWrite(PINML1, 0);
 			}
 			else
 			{
@@ -98,14 +101,14 @@ void loop()
 				digitalWrite(PINML1, 1);
 			}
 		}
-		else if(y < -10)
+		else if(y < -MAX_Y)
 		{
 			if(direction)
 			{
 				
 				digitalWrite(PINMR0, 0);
-				digitalWrite(PINMR1, 1);
-				digitalWrite(PINML0, 0);
+				digitalWrite(PINMR1, 0);
+				digitalWrite(PINML0, 1);
 				digitalWrite(PINML1, 0);
 			}
 			else
@@ -137,13 +140,31 @@ void loop()
 			}
 		}
 		
-		if(x > 2000)
+		if((x > MAX_X) && (direction != 1))
 		{
 			direction = 1;
 			digitalWrite(PINMR0, 0);
 			digitalWrite(PINMR1, 0);
 			digitalWrite(PINML0, 0);
 			digitalWrite(PINML1, 0);
+			delay(500);
+			digitalWrite(PINMR0, 1);
+			digitalWrite(PINMR1, 0);
+			digitalWrite(PINML0, 1);
+			digitalWrite(PINML1, 0);
+		}
+		else if((x < 0) && (direction != 0))
+		{
+			direction = 0;
+			digitalWrite(PINMR0, 0);
+			digitalWrite(PINMR1, 0);
+			digitalWrite(PINML0, 0);
+			digitalWrite(PINML1, 0);
+			delay(500);
+			digitalWrite(PINMR0, 0);
+			digitalWrite(PINMR1, 1);
+			digitalWrite(PINML0, 0);
+			digitalWrite(PINML1, 1);
 		}
 
 

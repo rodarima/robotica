@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#define SLEEP 100
+#define SLEEP 200
 
 #define PINLDR0	0
 #define PINLDR1	1
@@ -39,43 +39,19 @@ int sonar()
 	digitalWrite(PINSNRT, 1);
 	delayMicroseconds(10);
 
-	return pulseIn(PINSNRE, HIGH, 8000);
+	return pulseIn(PINSNRE, HIGH, 20000);
+}
+
+void print_json()
+{
+	Serial.print("{\"snr0\":");
+	Serial.print(snr0);
+	Serial.print("}\n");
 }
 
 void loop()
 {
-	ldr0_off = analogRead(PINLDR0);
-	ldr1_off = analogRead(PINLDR1);
-	
-	Serial.print("ldr0_off:");
-	Serial.print(ldr0_off);
-	Serial.print("\tldr1_off:");
-	Serial.print(ldr1_off);
-	
-	leds(1);
-	delay(SLEEP);
-	
-	ldr0_on = analogRead(PINLDR0);
-	ldr1_on = analogRead(PINLDR1);
-	
-	Serial.print("\tldr0_on:");
-	Serial.print(ldr0_on);
-	Serial.print("\tldr1_on:");
-	Serial.print(ldr1_on);
-
-	Serial.print("\tldr0_dif:");
-	Serial.print(ldr0_off - ldr0_on);
-	Serial.print("\tldr1_dif:");
-	Serial.print(ldr1_off - ldr1_on);
-	
-
-	leds(0);
-	delay(SLEEP);
-	
 	snr0 = sonar();
-	Serial.print("\tsnr0:");
-	Serial.print(snr0);
-
-	
-	Serial.print("\n");
+	print_json();
+	delay(50);
 }

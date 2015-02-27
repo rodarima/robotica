@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-#define SLEEP 100
+#define SLEEP 200
 
 #define PINLDR0	0
 #define PINLDR1	1
