@@ -40,10 +40,12 @@ mr0data = np.zeros(N)
 ml1data = np.zeros(N)
 mr1data = np.zeros(N)
 
+loop = 0
+
 while True:
 	try:
 		line = s.readline().decode("utf-8")
-		print("Leido: [" + line + "]")
+		#print("Leido: [" + line + "]")
 		data = json.loads(line)
 
 		x = data['pos']['x']
@@ -75,13 +77,18 @@ while True:
 	ml1data = np.roll(ml1data, -1)
 	mr1data = np.roll(mr1data, -1)
 
-	curvex.setData(xdata)
-	curvey.setData(ydata)
-	curvedx.setData(dxdata)
-	curvedy.setData(dydata)
-	curveml0.setData(ml0data)
-	curvemr0.setData(mr0data)
-	curveml1.setData(ml1data)
-	curvemr1.setData(mr1data)
+	loop+=1
 
-	pg.QtGui.QApplication.processEvents()
+	if(loop > 5):
+		loop = 0
+
+		curvex.setData(xdata)
+		curvey.setData(ydata)
+		curvedx.setData(dxdata)
+		curvedy.setData(dydata)
+		curveml0.setData(ml0data)
+		curvemr0.setData(mr0data)
+		curveml1.setData(ml1data)
+		curvemr1.setData(mr1data)
+
+		pg.QtGui.QApplication.processEvents()
