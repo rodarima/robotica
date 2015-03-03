@@ -1,0 +1,230 @@
+% Usar el tipo de documento: Artículo científico.
+\documentclass[10pt,a4paper,hidelinks]{article}
+
+% Cargar mensajes en español.
+\usepackage[spanish,es-noquoting]{babel}
+
+% Usar codificación utf-8 para acentos y otros.
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% Usar dos columnas
+\usepackage{multicol}
+
+% Separar las columnas
+\setlength{\columnsep}{1cm}
+
+% Dimensiones de los márgenes.
+\usepackage[margin=1.8cm]{geometry}
+
+% Insertar porciones de código
+\usepackage{listings}
+
+% Comenzar párrafos con separación no indentación.
+\usepackage{parskip}
+%enlaces
+\usepackage{hyperref}
+% Usar gráficos
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+%
+% Usar contenedores flotantes para figuras.
+\usepackage{float}
+
+% Carpeta de las imágenes.
+\graphicspath{{img/}}
+
+% Matemáticas
+\usepackage{amsmath}
+
+% Dibujos geométricos
+\usepackage{tikz}
+\usetikzlibrary{through,calc,arrows}
+
+
+\begin{document}
+
+%\maketitle
+\begin{center}
+\begin{huge}
+\textbf{Cucabot}
+\end{huge}
+\\[10pt]
+\textbf{Rodrigo Arias Mallo}\\
+rodrigo.arias@udc.es
+\end{center}
+
+\newcommand\RobotAngle{45}
+\newcommand\RobotSize{2}
+\newcommand\RobotRadius{4}
+
+\begin{multicols}{2}
+
+\section{Descripción}
+Cucabot es un robot diseñado para aprender los principios básicos de la robótica.
+Ha sido creado con la intención de reutilizar componentes de antiguos aparatos y 
+darles un nuevo uso.
+
+\subsection{Sensores}
+Cuenta con varios sensores que le permiten obtener información del entorno, así
+como información sobre sí mismo. Son los siguientes:
+
+\begin{enumerate}
+	% Quitar espacio entre lineas
+	\setlength{\parskip}{0cm}
+
+	\item Sensor de ultrasonidos HC-SR04
+	\item Ratón de bola
+	\item Sensor de luz LDR dirigido hacia delante
+	\item Sensor de luz LDR ambiental
+\end{enumerate}
+
+\subsection{Motores}
+Para efectuar el movimiento, dispone de dos motores Mabuchi RF-500TB-12560, colocados
+a ambos lados.
+
+\subsection{Ratón}
+
+En la parte posterior, un ratón de bola permite obtener mediciones del movimiento del
+robot. Tiene un controlador EM83702BP, que dispone con dos contadores digitales que
+realizan la medición del desplazamiento en el eje x e y.
+
+Una bola de goma (caucho?) se encuentra en contacto con el suelo. Al desplazar el ratón, 
+la bola gira alrededor de un eje imaginario, que es perpendicular al sentido del
+desplazamiento y paralelo al suelo.
+
+\begin{center}
+\centering
+\includegraphics[scale=0.50]{mouse.pdf}
+\captionof{figure}{Bola del ratón y los dos ejes. Medidas en mm.}
+\end{center}
+
+Ya que los movimientos efectuados por el robot serán los que provoquen sus dos ruedas,
+se puede determinar la posición, midiendo sólo el desplazamiento del ratón. Para ello,
+se observa en la figura~\ref{fig:giro} un ejemplo de un giro de $\alpha = \RobotAngleº$.
+
+\begin{center}
+\begin{tikzpicture}[>=latex]
+    %\path[draw] (-4,0)  coordinate [label= left:$A$] (A)
+    %        -- ( 0,4)  coordinate [label=above:$C$] (C)
+    %        -- ( 4,0)  coordinate [label=right:$B$] (B)
+    %        -- cycle;
+    %\foreach \point in {A,B,C}
+    %       \fill [black] (\point) circle (2pt);
+    %\draw [color=red] circle(4cm);
+    
+    
+    %\draw (A) rectangle (1,1);
+    
+    %\def\robotsize{(1,1)}
+    %\pgfmathsetmacro{\RobotSize}{2.0}%
+    %\pgfmathsetmacro{\RobotAngle}{-45.0}%
+    %\pgfmathsetmacro{\RobotRadius}{6.0}%
+    \pgfmathsetmacro{\RobotBall}{0.15}%
+    \pgfmathsetmacro{\RobotOC}{sqrt(\RobotSize*\RobotSize + \RobotRadius*\RobotRadius)}%
+    \pgfmathsetmacro{\RobotAngleAOC}{atan(\RobotSize/\RobotRadius)}%
+    \def\BallBeta{\RobotAngleAOC}
+        
+    
+    \fill [black] (0,0) coordinate [label=left:$O$] (O) circle (1pt);
+    \fill [black] (0:\RobotRadius) coordinate [label=below:$A_1$] (A1) circle (1pt);
+    \fill [black] (\RobotAngle:\RobotRadius) coordinate [label=above:$A_2$] (A2) circle (1pt);
+    \fill (A1) +(0,-\RobotSize) coordinate [label=below:$C_1$] (C1) circle (1pt);
+    \fill[rotate=\RobotAngle] (A2) +(0,-\RobotSize) coordinate [label=above:$C_2$] (C2) circle (1pt);
+    
+    
+    \draw[dotted] (O) -- (A1);
+    \draw[dotted] (O) -- (A2);
+    \draw[dotted] (O) -- (C1);
+    
+    % Ángulos
+    \draw[dotted] (\RobotRadius/5,0) arc (0:\RobotAngle:\RobotRadius/5.0) node[pos=0.5,auto=right]{$\alpha$};
+    \draw[dotted] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0) node[pos=0.5,auto=left]{$\beta$};
+    \draw[dotted] (A1) +(-\RobotRadius/5,0) arc (180:90+\RobotAngle/2:\RobotRadius/5.0) node[pos=0.5,auto=left]{$\gamma$};
+    
+    % Dibujar el robot en A1
+    \draw[dotted] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
+    \draw[dotted] (C1) circle(\RobotBall);
+    
+    %Dibujar el robot en A2
+    \draw[dotted,rotate=\RobotAngle] (A2) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
+    \draw[dotted] (C2) circle(\RobotBall);
+    
+   	%Trayectoria raton
+   	%\pgfmathsetmacro{\XValueArc}{\ArcRadius*cos(\ArcAngle)}%
+   	\draw[blue] (C1) arc (-\RobotAngleAOC:\RobotAngle-\RobotAngleAOC:\RobotOC) node[pos=0.5,auto=right]{$a$};
+    
+    %\draw (0,0) coordinate [label=right:$O$] (O) circle(4);
+    \draw[dotted] (A1) arc (0:\RobotAngle:\RobotRadius);
+    \draw[-latex,shorten >=1pt] (A1) -- (A2) node[pos=0.5,auto=right]{$\vec{r}$};
+    
+    %Dibujar el vector del raton
+    \draw[red,-latex,shorten >=1pt] (C1) -- +(90-\RobotAngleAOC:\RobotRadius/3) node[pos=0.5,auto=right]{$\vec{m}$};
+    
+    
+\end{tikzpicture}
+\captionof{figure}{Diagrama de un giro del robot.\label{fig:giro}}
+\end{center}
+
+El vector $ \vec{r} $ indica el movimiento que realizó el robot en línea recta.
+Conociendo el ángulo $\gamma$:
+
+	$$ r_x ?= \overline{OA_1} \cdot e \cos(\gamma) $$
+	$$ r_y ?= \overline{OA_1} \cdot \sin(\gamma) $$
+
+\begin{center}
+\begin{tikzpicture}[>=latex]
+    \pgfmathsetmacro{\BallRadius}{3.0}%
+    \pgfmathsetmacro{\BallOptoL}{2}%
+    \pgfmathsetmacro{\BallOptoD}{0.5}%
+    \pgfmathsetmacro{\BallBeta}{atan(\RobotSize/\RobotRadius)}%
+    \pgfmathsetmacro{\BallBetaDouble}{90.0-\BallBeta*2.0}%
+    
+    \draw circle(\BallRadius);
+    \fill [black] (0,0) coordinate [label=below:$O$] (O) circle (1pt);
+    %Puntos de choque
+    \fill [black] (0,-\BallRadius) coordinate [label=above:$B_x$] (Bx) circle (1pt);
+    \fill [black] (-\BallRadius,0) coordinate [label=right:$B_y$] (By) circle (1pt);
+    %Ejes
+    \draw[dotted] (-\BallRadius,0) -- (\BallRadius,0);
+    \draw[dotted] (0,\BallRadius) -- (0,-\BallRadius);
+    %Cilindros de los ejes
+    \draw[dotted] (By) +(\BallOptoD,-\BallOptoL) rectangle +(0,\BallOptoL);
+    \draw[dotted] (Bx) +(-\BallOptoL,\BallOptoD) rectangle +(\BallOptoL,0);
+    %Puntos
+    \fill[black] (180-\BallBeta*2:\BallRadius) coordinate [label=above:$C_y$] (Cy) circle (1pt);
+    \draw[blue] (By) -- (Cy) node[pos=0.5,auto=right]{$d_y$};
+    \fill[black] (90-\BallBeta*2:\BallRadius) coordinate [label=above:$C_x$] (Cx) circle (1pt);
+    \draw[blue] (Bx) -- (Cx) node[pos=0.5,auto=right]{$d_x$};
+    %Ángulos
+    %\draw[dotted] (Bx) +(-90:\BallRadius/5) arc (-90:-90-\BallBeta:\BallRadius/5.0) node[pos=0,auto=left]{$\beta$};
+    %Dibujar el vector del raton
+    \draw[red,-latex,shorten >=1pt] (O) -- +(90-\BallBeta:\BallRadius/2) node[pos=0.5,auto=right]{$\vec{m}$};
+
+	\draw[dotted] (O) -- (Cx);
+	%\draw[dotted] (Cx) +(270.0-\BallBeta:\BallRadius/5) arc (90.0-\BallBeta:\BallBetaDouble:\BallRadius/5.0) node[auto=right]{$\beta$};
+	
+	%\draw[dotted] (O) +(\BallBetaDouble:\BallRadius/4.0) arc (\BallBetaDouble:-90.0:\BallRadius/4.0) node[auto=right,pos=0.5]{$\delta$};
+	
+	\draw[dotted] (O) -- (Cy);
+	%\draw[dotted] (O) +(90.0+\BallBetaDouble:\BallRadius/6.0) arc (90.0+\BallBetaDouble:180.0:\BallRadius/6.0) node[auto=above]{$\theta$};
+	%node[auto=left,pos=0.5]{$\theta$}
+    
+    
+    
+    
+    
+    
+\end{tikzpicture}
+\captionof{figure}{Diagrama de la bola del ratón.\label{fig:bola}}
+\end{center}
+
+$$ \alpha = \widehat{OBC} $$
+
+$$ d_y = R crd  $$
+
+
+\end{multicols}
+\end{document}
