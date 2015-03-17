@@ -39,6 +39,9 @@
 % Matemáticas
 \usepackage{amsmath}
 
+% Símbolos del sistema internacional
+\usepackage{siunitx}
+
 % Dibujos geométricos
 \usepackage{tikz}
 \usetikzlibrary{through,calc,arrows,angles,babel}
@@ -267,7 +270,9 @@ Por lo tanto, si $t_e$ es el tiempo que tarda el sonido en llegar desde el emiso
 $$ s_1 = v_{air} \cdot t_e $$
 $$ s_2 = v_{air} \cdot t_r $$
 Sin embargo, medimos $t$ que es $t_e+t_r$. Si suponemos que el robot esta parado cuando haga la medición, $s_1 = s_2$ y por tanto $t_e = t_r$. Finalmente, $s$ es la distancia del sensor al obstáculo:
-$$ s = s_1 = s_2 = v_{air}\frac{t}{2} $$
+\begin{equation}
+	s = s_1 = s_2 = v_{air}\frac{t}{2}\label{eq:air}
+\end{equation}
 Es importante mencionar que $s$ no indica la posición exacta del obstáculo, si 
 no la distancia del mismo al sensor.
 
@@ -278,10 +283,10 @@ sonido. De modo que se realizarán una serie de experimentos, que indicarán de
 forma experimental dicho ángulo. En la figura~\ref{fig:sonar} se observa un
 esquema del experimento.
 
-Primero un objeto se coloca en el campo de visión del sensor. Luego se desplaza
-hacia $A_2$, siguiendo una trayectoria circular centrada en $O$, y se observa en
-que punto deja de observarse dicho objeto. De igual modo se repite en el otro
-sentido, y se calcula el ángulo $\theta_{sonar}$.
+Primero un objeto se coloca en el campo de visión del sensor, en $C_1$. Luego se 
+desplaza hacia $A_2$, siguiendo una trayectoria circular centrada en $O$, y se 
+observa el ángulo $\theta_1$ en el que deja de observarse dicho objeto. De igual 
+modo se repite en el otro sentido, y se calcula el ángulo $\theta_{2}$.
 
 Dado que el sonar puede no estar centrado, se anotarán las medidas de $\theta_1$
 y $\theta_2$, para luego estimar $\theta_{sonar}$.
@@ -327,8 +332,10 @@ y $\theta_2$, para luego estimar $\theta_{sonar}$.
 		radius=\SonarS];
 	
 	% Pintar el vector s
-	\draw[red,-latex,shorten >=1pt] (O) -- (C1)
-		node[pos=0.5,auto=left]{$\vec{s}$};
+	%\draw[red,-latex,shorten >=1pt] (O) -- (C1)
+	%	node[pos=0.5,auto=left]{$\vec{s}$};
+	\draw[red] (O) -- (C1)
+		node[pos=0.5,auto=left]{$s$};
     
 	% Ángulos
 	\begin{scope}
@@ -377,19 +384,19 @@ y $\theta_2$, para luego estimar $\theta_{sonar}$.
 
 Tras realizar las mediciones, se obtienen los siguientes resultados.
 \begin{center}
-\begin{tabular}{ c | c | c | c | c }
+\begin{tabular}{ | c | c | c | }
 \hline
-$s$ & $\theta_1$ & $t_1$ & $\theta_2$ & $t_2$ \\ \hline
-m    &  º &   ms &  º &   ms \\ \hline \hline
-0.20 & 30 &  925 & 27 &  887 \\ \hline
-0.30 & 30 & 1358 & 27 & 1340 \\ \hline
-0.40 & 31 & 1752 & 28 & 1740 \\ \hline
-0.50 & 28 & 2150 & 26 & 2150 \\ \hline
-0.60 & 30 & 2595 & 28 & 2550 \\ \hline
-0.80 & 31 & 3480 & 29 & 3400 \\ \hline
-1.00 & 29 & 4360 & 29 & 4260 \\ \hline
-1.20 & 30 & 5130 & 28 & 5080 \\ \hline \hline
-media& 29.875 &    & 27.75 & \\ \hline
+$s$ & $\theta_1$ & $\theta_2$ \\ \hline
+m    &  º &  º \\ \hline \hline
+0.20 & 30 & 27 \\ \hline
+0.30 & 30 & 27 \\ \hline
+0.40 & 31 & 28 \\ \hline
+0.50 & 28 & 26 \\ \hline
+0.60 & 30 & 28 \\ \hline
+0.80 & 31 & 29 \\ \hline
+1.00 & 29 & 29 \\ \hline
+1.20 & 30 & 28 \\ \hline \hline
+media& 29.875 & 27.75 \\ \hline
 \end{tabular}
 \end{center}
 
@@ -404,33 +411,116 @@ $$\theta_{sonar} = \theta_1 + \theta_2 = 57.625 º $$
 
 Para completar la calibración, es necesario poder calcular la distancia $s$,
 sabiendo el tiempo $t$. Para ello, se realizará otro experimento, midiendo las
-distancias de forma manual $s_e$ con una regla, y comparándolas con el valor
-teórico $s_t$.
+distancias de forma manual $s_r$ con una regla, y comparándolas con el valor
+teórico $s_t$, calculado con la ecuación~\ref{eq:air}.
 
 \begin{center}
-\begin{tabular}{ c | c | c | c | c }
+\begin{tabular}{ | c | c | c | }
 \hline
-$s_{e}$ & $s_{t}$ & $t$ & $s_{c}$\\ \hline
-m & m & ms & m\\ \hline \hline
-0.20 & 0.138 & 805  & 0.200 \\ \hline
-0.30 & 0.210 & 1225 & 0.300 \\ \hline
-0.40 & 0.281 & 1638 & 0.399 \\ \hline
-0.50 & 0.353 & 2060 & 0.499 \\ \hline
-0.60 & 0.429 & 2500 & 0.604 \\ \hline
-0.80 & 0.568 & 3305 & 0.797 \\ \hline
-1.00 & 0.713 & 4155 & 0.999 \\ \hline
-1.20 & 0.859 & 5000 & 1.201 \\ \hline \hline
+$s_{r}$ & $s_{t}$ & $t$ \\ \hline
+m & m & \si{\micro\second} \\ \hline \hline
+0.20 & 0.138 & 0.805 \\ \hline
+0.30 & 0.210 & 1.225 \\ \hline
+0.40 & 0.281 & 1.638 \\ \hline
+0.50 & 0.353 & 2.060 \\ \hline
+0.60 & 0.429 & 2.500 \\ \hline
+0.80 & 0.568 & 3.305 \\ \hline
+1.00 & 0.713 & 4.155 \\ \hline
+1.20 & 0.859 & 5.000 \\ \hline
 \end{tabular}
 \end{center}
 
-Se observa que el valor teórico esperado $s_t$, no coincide con el valor real
-medido $s_e$. Por lo tanto ha de realizarse una corrección del error encontrado.
-Para ello se empleará una regresión lineal. Con Octave, polyfit muestra los
+Se observa que el valor teórico $s_t$, no coincide con el valor real medido 
+$s_r$.
+
+Sería posible solucionar el problema empleando una corrección del error. Para 
+ello se emplea una regresión lineal. Con Octave, \texttt{polyfit} muestra los 
 coeficientes de la recta:
+\begin{center}
+\texttt{2.3864e+02   7.8846e-03}
+\end{center}
+Cuya recta (rojo) se puede observar en la figura~\ref{fig:sonar_plot}. Su 
+ecuación es:
+$$s = 238.64t + 7.8846\cdot10^{-3}$$
+\begin{center}
+%	\includegraphics[width=0.8\textwidth]{image.png}
+	\includegraphics[scale=0.6]{sonar.pdf}
+	\captionof{figure}{Valores experimentales erróneos (rojo) y correctos 
+(azul). La recta punteada es el valor teórico.\label{fig:sonar_plot}}
+\end{center}
 
-$$s_c = 1.3885541s_t + 0.0086555$$
+Después de repasar el programa que muestra el tiempo en Arduino, resulta que la 
+función \texttt{pulseIn} calcula el tiempo que ha pasado, empleando un bucle, y 
+luego multiplica las vueltas del bucle por el número de instrucciones. Sin 
+embargo, el compilador \texttt{avr-gcc} puede alterar este número cuando se 
+aplican optimizaciones. Este problema, provoca que el tiempo se vea alterado de 
+la forma $ t_{real} = t * K $. Siendo $ K = 1.3898 $, hallado de forma 
+experimental.
+
+Tras programar una nueva biblioteca para emplear el sensor de ultrasonidos, de 
+forma independiente a las optimizaciones del código, y empleando las 
+interrupciones, se vuelven a realizar las medidas. Para calcular el tiempo se 
+realizan 100000 mediciones y se halla la media.
+
+\begin{center}
+\begin{tabular}{ | c | c | c | }
+\hline
+$s_{r}$ & $s_{t}$ & $t$\\ \hline
+m & m & \si{\micro\second} \\ \hline \hline
+0.20 & 0.193 & 1122 \\ \hline
+0.30 & 0.293 & 1705 \\ \hline
+0.40 & 0.392 & 2285 \\ \hline
+0.50 & 0.489 & 2848 \\ \hline
+0.60 & 0.588 & 3422 \\ \hline
+0.80 & 0.789 & 4597 \\ \hline
+1.00 & 0.998 & 5810 \\ \hline
+1.20 & 1.197 & 6970 \\ \hline
+\end{tabular}
+\end{center}
+
+Obteniendo por regresión lineal, de la misma forma, los coeficientes:
+\begin{center}
+\texttt{1.7084e+02   1.0857e-02}
+\end{center}
+Y por tanto, la recta característica es:
+$$ s = 170.84 t + 1.0857\cdot 10^{-2} = 341.68\frac{t}{2} + 1.0857\cdot 10^{-2}
+$$
+
+Si la comparamos con la ecuación~\ref{eq:air}, se puede observar que es muy 
+similar a lo esperado.
+
+La velocidad del sonido calculada de forma experimental, resulta ser 341.68 m/s.  
+Este valor puede oscilar, ya que depende de la temperatura. Para calcular la 
+temperatura:
+$$ \vartheta = \frac{v_{air}-331.3}{0.606} = 17.129 º $$
+Dado que el experimento se ha realizado por la noche, esa temperatura se 
+encuentra dentro de un margen adecuado. Por lo que se puede afirmar que el 
+experimento muestra unos resultados esperados.
+
+Existe un error fijo de aproximadamente un centímetro, que se debe a la 
+dificultad de centrar la regla en el centro del sensor de ultrasonidos. Sin 
+embargo, para determinar la distancia de un objeto al robot, esta distancia es 
+despreciable.
+
+Es importante mencionar, que un ajuste del error, empleando un método de 
+regresión, permite esconder errores como el que ha sido detectado y corregido.  
+Por ello, se ha decidido emplear los cálculos teóricos, y si no concuerdan con 
+los esperados, averiguar que ha causado el error.
+
+\section{Posibles errores}
+
+La función \texttt{attachInterrupt} no borra las banderas (flags) \texttt{INTF0} 
+y \texttt{INTF1} del registro \texttt{EIFR}, de forma que al colocar una 
+interrupción por primera vez, es posible que se ejecute al comienzo sin haber 
+recibido tal interrupción. Una posible solución es añadir esta línea al comienzo 
+de la función:
+
+\texttt{EIFR |= \_BV(INTF0) || \_BV(INTF1);}
+
+La función \texttt{pulseIn} calcula el tiempo dependiendo de las optimizaciones
+que se produzcan. Es necesario que sea independiente. Además es conveniente
+sustituirla por alguna función no bloqueante que emplee interrupciones.
 \\
-
 
 \end{multicols}
 \end{document}

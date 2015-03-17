@@ -74,8 +74,8 @@ CINCS = $(shell for path in $(ARDUINO_LOCAL_SRC); do echo -n "-I$$path "; done) 
 CXXINCS = $(shell for path in $(ARDUINO_LOCAL_SRC); do echo -n "-I$$path "; done) -I./
 
 # Compiler and linker options from Arduino IDE
-CFLAGS = -Wall -g -fno-use-cxa-atexit -O2 -w -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CDEFS) $(CINCS)
-CXXFLAGS = -Wall -g -fno-use-cxa-atexit -O2 -w -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CXXDEFS) $(CXXINCS)
+CFLAGS = -Wall -g -fno-use-cxa-atexit -w -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CDEFS) $(CINCS)
+CXXFLAGS = -Wall -g -fno-use-cxa-atexit -w -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CXXDEFS) $(CXXINCS)
 LDFLAGS = -Wl,--gc-section
 
 
