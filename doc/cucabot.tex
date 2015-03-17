@@ -257,27 +257,40 @@ El sensor de ultrasonidos, permite averiguar de forma estimada la posición de u
 
 Para calcular la distancia del objeto, se mide el tiempo que tarda el pulso ultrasónico en viajar desde el emisor al objeto, y tras rebotar, volver al receptor.
 
-La velocidad del sonido, depende de la temperatura del aire $\vartheta$, además de otros factores\footnote{\url{http://en.wikipedia.org/wiki/Speed\_of\_sound\#Practical\_formula\_for\_dry\_air}}. Sin embargo, para una simplificación de los cálculos, se empleará la siguiente fórmula, asumiendo que es la misma en todas partes:
-
+La velocidad del sonido, depende de la temperatura del aire $\vartheta$, además
+de otros
+factores\footnote{\url{http://en.wikipedia.org/wiki/Speed\_of\_sound\#Practical\_formula\_for\_dry\_air}}.
+Sin embargo, para una simplificación de los cálculos, se empleará la siguiente
+fórmula, asumiendo que la temperatura $\vartheta$ es la misma en todas partes:
 $$ v_{air} = 331.3 + 0.606\vartheta $$
+Por lo tanto, si $t_e$ es el tiempo que tarda el sonido en llegar desde el emisor al obstáculo, y $t_r$ el tiempo desde el obstáculo al receptor:
+$$ s_1 = v_{air} \cdot t_e $$
+$$ s_2 = v_{air} \cdot t_r $$
+Sin embargo, medimos $t$ que es $t_e+t_r$. Si suponemos que el robot esta parado cuando haga la medición, $s_1 = s_2$ y por tanto $t_e = t_r$. Finalmente, $s$ es la distancia del sensor al obstáculo:
+$$ s = s_1 = s_2 = v_{air}\frac{t}{2} $$
+Es importante mencionar que $s$ no indica la posición exacta del obstáculo, si 
+no la distancia del mismo al sensor.
 
-Por lo tanto, si $t_1$ es el tiempo que tarda el sonido en llegar desde el emisor al obstáculo, y $t_2$ el tiempo desde el obstáculo al receptor:
+\subsubsection{Ángulo de apertura $\theta_{sonar}$}
+Para calibrar el sensor, es necesario determinar el ángulo de apertura 
+$\theta_{sonar}$, que indica hasta que punto el sensor puede recibir el eco del 
+sonido. De modo que se realizarán una serie de experimentos, que indicarán de 
+forma experimental dicho ángulo. En la figura~\ref{fig:sonar} se observa un
+esquema del experimento.
 
-$$ s_1 = v_{air} \cdot t_1 $$
-$$ s_2 = v_{air} \cdot t_2 $$
+Primero un objeto se coloca en el campo de visión del sensor. Luego se desplaza
+hacia $A_2$, siguiendo una trayectoria circular centrada en $O$, y se observa en
+que punto deja de observarse dicho objeto. De igual modo se repite en el otro
+sentido, y se calcula el ángulo $\theta_{sonar}$.
 
-Sin embargo, medimos $t$ que es $t_1+t_2$. Si suponemos que el robot esta parado cuando haga la medición, $s_1 = s_2$ y por tanto $t_1 = t_2$. Finalmente, $s$ es la distancia del sensor al obstáculo:
-
-	$$ s = s_1 = s_2 = v_{air}\frac{t}{2} $$
-
-Es importante mencionar que $s$ no indica la posición exacta del obstáculo, si no la distancia del mismo al sensor.
-
-Para calibrar el sensor, es necesario determinar el ángulo de apertura $\theta_{sonar}$, que indica hasta que punto el sensor puede recibir el eco del sonido.
+Dado que el sonar puede no estar centrado, se anotarán las medidas de $\theta_1$
+y $\theta_2$, para luego estimar $\theta_{sonar}$.
 
 \begin{center}
 \begin{tikzpicture}[>=latex]
 
 	\pgfmathsetmacro{\SonarS}{6}
+	\pgfmathsetmacro{\Obstacle}{1}
 	\pgfmathsetmacro{\RobotSemiTheta}{\RobotThetaSonar/2.0}
     \pgfmathsetmacro{\RobotBall}{0.15}%
     \pgfmathsetmacro{\RobotOC}{sqrt(\RobotSize*\RobotSize + \RobotRadius*\RobotRadius)}%
@@ -286,6 +299,7 @@ Para calibrar el sensor, es necesario determinar el ángulo de apertura $\theta_
         
     
     \fill [black] (0,0) coordinate [label=left:$O$] (O) circle (1pt);
+    \coordinate (X) at (\SonarS/4,0);
     \fill [black] (-\RobotThetaSonar/2:\SonarS) coordinate [label=right:$A_1$] (A1) circle (1pt);
     \fill [black] (\RobotThetaSonar/2:\SonarS) coordinate [label=right:$A_2$] (A2) circle (1pt);
         \fill [black] (\RobotThetaSonar/4:\SonarS) coordinate [label=right:$C_1$] (C1) circle (1pt);
@@ -294,10 +308,16 @@ Para calibrar el sensor, es necesario determinar el ángulo de apertura $\theta_
 %    \fill[rotate=\RobotAngle] (A2) +(0,-\RobotSize) coordinate [label=above:$C_2$] (C2) circle (1pt);
 
 	%(-\RobotThetaSonar/2:30:\SonarS) node[pos=0.5,auto=right]{$a$};
+
+	% Pintar objeto 1
+	\draw[dotted,rotate=\RobotThetaSonar/4] (C1) +(0,\Obstacle/2) rectangle +(\Obstacle,-\Obstacle/2);
+
+	% Pintar objeto 2
+	\draw[dotted,rotate=\RobotThetaSonar*3/4] (C2) +(0,\Obstacle/2) rectangle +(\Obstacle,-\Obstacle/2);
     
-    
-    \draw[dotted] (O) -- (A1);
-    \draw[dotted] (O) -- (A2);
+    \draw (O) -- (A1);
+    \draw (O) -- (A2);
+    \draw[dotted] (O) -- (X);
     %\draw[dotted] (O) -- (C1);
 
 	%Dibujar anco del campo de visión
@@ -305,22 +325,22 @@ Para calibrar el sensor, es necesario determinar el ángulo de apertura $\theta_
 		start angle=\RobotThetaSonar/2,
 		delta angle=-\RobotThetaSonar,
 		radius=\SonarS];
+	
+	% Pintar el vector s
+	\draw[red,-latex,shorten >=1pt] (O) -- (C1)
+		node[pos=0.5,auto=left]{$\vec{s}$};
     
-    % Ángulos
-    %\draw[dotted] (\RobotThetaSonar/2:\SonarS/5) arc[
-%		start angle=\RobotThetaSonar/2,
-%		delta angle=-\RobotThetaSonar,
-%		radius=\SonarS/5] node[auto]{$\theta_{sonar}$};
-	%\pic ["$\theta$"] {angle = (A2)--(O)--(A1)};
-	%\path[clip] (A1) -- (O) -- (A2);
-	%\node[circle,draw=red,minimum size=3] at (0,0) (circ) {};
+	% Ángulos
+	\begin{scope}
+		\path[clip] (A1) -- (O) -- (A2) -- cycle;
+		%\draw [red, fill=red!20] (O) circle (1.5);
+		\draw [dotted] (O) circle (\SonarS/3);
+		\node[right] at ($(O) +(\SonarS/3, 0)$) {$\theta_{sonar}$};
 
-	%\coordinate (D) at (barycentric cs:A1=0.5 ,A2=0.5);
-	%\node [above right] at (D) {D};
-	\path[clip] (A1) -- (O) -- (A2) -- cycle;
-	\draw [red, fill=red!20] (O) circle (30pt);
-	%\draw [dotted] (O) circle (30pt)
-	%\node[right] at (O) {holaa};
+		\draw [dotted] (O) circle (\SonarS/5);
+		\node[right] at ($(O) +(\RobotThetaSonar/4:\SonarS/5)$) {$\theta_1$};
+		\node[right] at ($(O) +(-\RobotThetaSonar/4:\SonarS/5)$) {$\theta_2$};
+	\end{scope}
 
 
 		
@@ -351,11 +371,65 @@ Para calibrar el sensor, es necesario determinar el ángulo de apertura $\theta_
     
     
 \end{tikzpicture}
-\captionof{figure}{Sensor de ultrasonido.\label{fig:giro}}
+\captionof{figure}{Sensor de ultrasonido.\label{fig:sonar}}
 \end{center}
 
 
+Tras realizar las mediciones, se obtienen los siguientes resultados.
+\begin{center}
+\begin{tabular}{ c | c | c | c | c }
+\hline
+$s$ & $\theta_1$ & $t_1$ & $\theta_2$ & $t_2$ \\ \hline
+m    &  º &   ms &  º &   ms \\ \hline \hline
+0.20 & 30 &  925 & 27 &  887 \\ \hline
+0.30 & 30 & 1358 & 27 & 1340 \\ \hline
+0.40 & 31 & 1752 & 28 & 1740 \\ \hline
+0.50 & 28 & 2150 & 26 & 2150 \\ \hline
+0.60 & 30 & 2595 & 28 & 2550 \\ \hline
+0.80 & 31 & 3480 & 29 & 3400 \\ \hline
+1.00 & 29 & 4360 & 29 & 4260 \\ \hline
+1.20 & 30 & 5130 & 28 & 5080 \\ \hline \hline
+media& 29.875 &    & 27.75 & \\ \hline
+\end{tabular}
+\end{center}
 
+Se empleará la media de los valores de los ángulos, para reducir los errores que
+se pudieran producir en las medidas de los mismos, quedando $\theta_1 = 29.875
+º$ y $\theta_2 = 27.75 º$.
+
+Por lo tanto ya se puede obtener el ángulo de apertura:
+$$\theta_{sonar} = \theta_1 + \theta_2 = 57.625 º $$
+
+\subsubsection{Distancia medida}
+
+Para completar la calibración, es necesario poder calcular la distancia $s$,
+sabiendo el tiempo $t$. Para ello, se realizará otro experimento, midiendo las
+distancias de forma manual $s_e$ con una regla, y comparándolas con el valor
+teórico $s_t$.
+
+\begin{center}
+\begin{tabular}{ c | c | c | c | c }
+\hline
+$s_{e}$ & $s_{t}$ & $t$ & $s_{c}$\\ \hline
+m & m & ms & m\\ \hline \hline
+0.20 & 0.138 & 805  & 0.200 \\ \hline
+0.30 & 0.210 & 1225 & 0.300 \\ \hline
+0.40 & 0.281 & 1638 & 0.399 \\ \hline
+0.50 & 0.353 & 2060 & 0.499 \\ \hline
+0.60 & 0.429 & 2500 & 0.604 \\ \hline
+0.80 & 0.568 & 3305 & 0.797 \\ \hline
+1.00 & 0.713 & 4155 & 0.999 \\ \hline
+1.20 & 0.859 & 5000 & 1.201 \\ \hline \hline
+\end{tabular}
+\end{center}
+
+Se observa que el valor teórico esperado $s_t$, no coincide con el valor real
+medido $s_e$. Por lo tanto ha de realizarse una corrección del error encontrado.
+Para ello se empleará una regresión lineal. Con Octave, polyfit muestra los
+coeficientes de la recta:
+
+$$s_c = 1.3885541s_t + 0.0086555$$
+\\
 
 
 \end{multicols}
