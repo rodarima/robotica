@@ -38,9 +38,14 @@
 
 % Matemáticas
 \usepackage{amsmath}
+\usepackage{mathtools}
 
 % Símbolos del sistema internacional
 \usepackage{siunitx}
+
+% Dibujar circuitos electrónicos
+%\usepackage[symbols]{circuitikz}
+\usepackage[siunitx]{circuitikz}
 
 % Dibujos geométricos
 \usepackage{tikz}
@@ -113,145 +118,6 @@ como información sobre sí mismo. Son los siguientes:
 Para efectuar el movimiento, dispone de dos motores Mabuchi RF-500TB-12560, colocados
 a ambos lados.
 
-\subsection{Ratón}
-
-En la parte posterior, un ratón de bola permite obtener mediciones del movimiento del
-robot. Tiene un controlador EM83702BP, que dispone con dos contadores digitales que
-realizan la medición del desplazamiento en el eje x e y.
-
-Una bola de goma (caucho?) se encuentra en contacto con el suelo. Al desplazar el ratón, 
-la bola gira alrededor de un eje imaginario, que es perpendicular al sentido del
-desplazamiento y paralelo al suelo.
-
-%\begin{center}
-%\centering
-%\includegraphics[scale=0.50]{mouse.pdf}
-%\captionof{figure}{Bola del ratón y %los dos ejes. Medidas en mm.}
-%\end{center}
-
-Ya que los movimientos efectuados por el robot serán los que provoquen sus dos ruedas,
-se puede determinar la posición, midiendo sólo el desplazamiento del ratón. Para ello,
-se observa en la figura~\ref{fig:giro} un ejemplo de un giro de $\alpha = \RobotAngleº$.
-
-\begin{center}
-\begin{tikzpicture}[>=latex]
-    %\path[draw] (-4,0)  coordinate [label= left:$A$] (A)
-    %        -- ( 0,4)  coordinate [label=above:$C$] (C)
-    %        -- ( 4,0)  coordinate [label=right:$B$] (B)
-    %        -- cycle;
-    %\foreach \point in {A,B,C}
-    %       \fill [black] (\point) circle (2pt);
-    %\draw [color=red] circle(4cm);
-    
-    
-    %\draw (A) rectangle (1,1);
-    
-    %\def\robotsize{(1,1)}
-    %\pgfmathsetmacro{\RobotSize}{2.0}%
-    %\pgfmathsetmacro{\RobotAngle}{-45.0}%
-    %\pgfmathsetmacro{\RobotRadius}{6.0}%
-    \pgfmathsetmacro{\RobotBall}{0.15}%
-    \pgfmathsetmacro{\RobotOC}{sqrt(\RobotSize*\RobotSize + \RobotRadius*\RobotRadius)}%
-    \pgfmathsetmacro{\RobotAngleAOC}{atan(\RobotSize/\RobotRadius)}%
-    \def\BallBeta{\RobotAngleAOC}
-        
-    
-    \fill [black] (0,0) coordinate [label=left:$O$] (O) circle (1pt);
-    \fill [black] (0:\RobotRadius) coordinate [label=below:$A_1$] (A1) circle (1pt);
-    \fill [black] (\RobotAngle:\RobotRadius) coordinate [label=above:$A_2$] (A2) circle (1pt);
-    \fill (A1) +(0,-\RobotSize) coordinate [label=below:$C_1$] (C1) circle (1pt);
-    \fill[rotate=\RobotAngle] (A2) +(0,-\RobotSize) coordinate [label=above:$C_2$] (C2) circle (1pt);
-    
-    
-    \draw[dotted] (O) -- (A1);
-    \draw[dotted] (O) -- (A2);
-    \draw[dotted] (O) -- (C1);
-    
-    % Ángulos
-    \draw[dotted] (\RobotRadius/5,0) arc (0:\RobotAngle:\RobotRadius/5.0) node[pos=0.5,auto=right]{$\alpha$};
-    \draw[dotted] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0) node[pos=0.5,auto=left]{$\beta$};
-    \draw[dotted] (A1) +(-\RobotRadius/5,0) arc (180:90+\RobotAngle/2:\RobotRadius/5.0) node[pos=0.5,auto=left]{$\gamma$};
-    
-    % Dibujar el robot en A1
-    \draw[dotted] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
-    \draw[dotted] (C1) circle(\RobotBall);
-    
-    %Dibujar el robot en A2
-    \draw[dotted,rotate=\RobotAngle] (A2) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
-    \draw[dotted] (C2) circle(\RobotBall);
-    
-   	%Trayectoria raton
-   	%\pgfmathsetmacro{\XValueArc}{\ArcRadius*cos(\ArcAngle)}%
-   	\draw[blue] (C1) arc (-\RobotAngleAOC:\RobotAngle-\RobotAngleAOC:\RobotOC) node[pos=0.5,auto=right]{$a$};
-    
-    %\draw (0,0) coordinate [label=right:$O$] (O) circle(4);
-    \draw[dotted] (A1) arc (0:\RobotAngle:\RobotRadius);
-    \draw[-latex,shorten >=1pt] (A1) -- (A2) node[pos=0.5,auto=right]{$\vec{r}$};
-    
-    %Dibujar el vector del raton
-    \draw[red,-latex,shorten >=1pt] (C1) -- +(90-\RobotAngleAOC:\RobotRadius/3) node[pos=0.5,auto=right]{$\vec{m}$};
-    
-    
-\end{tikzpicture}
-\captionof{figure}{Diagrama de un giro del robot.\label{fig:giro}}
-\end{center}
-
-El vector $ \vec{r} $ indica el movimiento que realizó el robot en línea recta.
-Conociendo el ángulo $\gamma$:
-
-	$$ r_x ?= \overline{OA_1} \cdot e \cos(\gamma) $$
-	$$ r_y ?= \overline{OA_1} \cdot \sin(\gamma) $$
-
-\begin{center}
-\begin{tikzpicture}[>=latex]
-    \pgfmathsetmacro{\BallRadius}{3.0}%
-    \pgfmathsetmacro{\BallOptoL}{2}%
-    \pgfmathsetmacro{\BallOptoD}{0.5}%
-    \pgfmathsetmacro{\BallBeta}{atan(\RobotSize/\RobotRadius)}%
-    \pgfmathsetmacro{\BallBetaDouble}{90.0-\BallBeta*2.0}%
-    
-    \draw circle(\BallRadius);
-    \fill [black] (0,0) coordinate [label=below:$O$] (O) circle (1pt);
-    %Puntos de choque
-    \fill [black] (0,-\BallRadius) coordinate [label=above:$B_x$] (Bx) circle (1pt);
-    \fill [black] (-\BallRadius,0) coordinate [label=right:$B_y$] (By) circle (1pt);
-    %Ejes
-    \draw[dotted] (-\BallRadius,0) -- (\BallRadius,0);
-    \draw[dotted] (0,\BallRadius) -- (0,-\BallRadius);
-    %Cilindros de los ejes
-    \draw[dotted] (By) +(\BallOptoD,-\BallOptoL) rectangle +(0,\BallOptoL);
-    \draw[dotted] (Bx) +(-\BallOptoL,\BallOptoD) rectangle +(\BallOptoL,0);
-    %Puntos
-    \fill[black] (180-\BallBeta*2:\BallRadius) coordinate [label=above:$C_y$] (Cy) circle (1pt);
-    \draw[blue] (By) -- (Cy) node[pos=0.5,auto=right]{$d_y$};
-    \fill[black] (90-\BallBeta*2:\BallRadius) coordinate [label=above:$C_x$] (Cx) circle (1pt);
-    \draw[blue] (Bx) -- (Cx) node[pos=0.5,auto=right]{$d_x$};
-    %Ángulos
-    %\draw[dotted] (Bx) +(-90:\BallRadius/5) arc (-90:-90-\BallBeta:\BallRadius/5.0) node[pos=0,auto=left]{$\beta$};
-    %Dibujar el vector del raton
-    \draw[red,-latex,shorten >=1pt] (O) -- +(90-\BallBeta:\BallRadius/2) node[pos=0.5,auto=right]{$\vec{m}$};
-
-	\draw[dotted] (O) -- (Cx);
-	%\draw[dotted] (Cx) +(270.0-\BallBeta:\BallRadius/5) arc (90.0-\BallBeta:\BallBetaDouble:\BallRadius/5.0) node[auto=right]{$\beta$};
-	
-	%\draw[dotted] (O) +(\BallBetaDouble:\BallRadius/4.0) arc (\BallBetaDouble:-90.0:\BallRadius/4.0) node[auto=right,pos=0.5]{$\delta$};
-	
-	\draw[dotted] (O) -- (Cy);
-	%\draw[dotted] (O) +(90.0+\BallBetaDouble:\BallRadius/6.0) arc (90.0+\BallBetaDouble:180.0:\BallRadius/6.0) node[auto=above]{$\theta$};
-	%node[auto=left,pos=0.5]{$\theta$}
-    
-    
-    
-    
-    
-    
-\end{tikzpicture}
-\captionof{figure}{Diagrama de la bola del ratón.\label{fig:bola}}
-\end{center}
-
-$$ \alpha = \widehat{OBC} $$
-
-$$ d_y = R crd  $$
 
 \section{Calibración de sensores}
 \subsection{Ultrasonidos HC-SR04}
@@ -325,7 +191,7 @@ y $\theta_2$, para luego estimar $\theta_{sonar}$.
     \draw[dotted] (O) -- (X);
     %\draw[dotted] (O) -- (C1);
 
-	%Dibujar anco del campo de visión
+	%Dibujar arco del campo de visión
 	\draw[dotted] (A2) arc[
 		start angle=\RobotThetaSonar/2,
 		delta angle=-\RobotThetaSonar,
@@ -419,14 +285,14 @@ teórico $s_t$, calculado con la ecuación~\ref{eq:air}.
 \hline
 $s_{r}$ & $s_{t}$ & $t$ \\ \hline
 m & m & \si{\micro\second} \\ \hline \hline
-0.20 & 0.138 & 0.805 \\ \hline
-0.30 & 0.210 & 1.225 \\ \hline
-0.40 & 0.281 & 1.638 \\ \hline
-0.50 & 0.353 & 2.060 \\ \hline
-0.60 & 0.429 & 2.500 \\ \hline
-0.80 & 0.568 & 3.305 \\ \hline
-1.00 & 0.713 & 4.155 \\ \hline
-1.20 & 0.859 & 5.000 \\ \hline
+0.20 & 0.138 &  805 \\ \hline
+0.30 & 0.210 & 1225 \\ \hline
+0.40 & 0.281 & 1638 \\ \hline
+0.50 & 0.353 & 2060 \\ \hline
+0.60 & 0.429 & 2500 \\ \hline
+0.80 & 0.568 & 3305 \\ \hline
+1.00 & 0.713 & 4155 \\ \hline
+1.20 & 0.859 & 5000 \\ \hline
 \end{tabular}
 \end{center}
 
@@ -444,7 +310,7 @@ ecuación es:
 $$s = 238.64t + 7.8846\cdot10^{-3}$$
 \begin{center}
 %	\includegraphics[width=0.8\textwidth]{image.png}
-	\includegraphics[scale=0.6]{sonar.pdf}
+	\includegraphics[scale=0.58]{sonar.pdf}
 	\captionof{figure}{Valores experimentales erróneos (rojo) y correctos 
 (azul). La recta punteada es el valor teórico.\label{fig:sonar_plot}}
 \end{center}
@@ -459,8 +325,9 @@ experimental.
 
 Tras programar una nueva biblioteca para emplear el sensor de ultrasonidos, de 
 forma independiente a las optimizaciones del código, y empleando las 
-interrupciones, se vuelven a realizar las medidas. Para calcular el tiempo se 
-realizan 100000 mediciones y se halla la media.
+interrupciones, se vuelven a realizar las medidas.
+
+%Para calcular el tiempo se realizan 100000 mediciones y se halla la media.
 
 \begin{center}
 \begin{tabular}{ | c | c | c | }
@@ -492,10 +359,11 @@ similar a lo esperado.
 La velocidad del sonido calculada de forma experimental, resulta ser 341.68 m/s.  
 Este valor puede oscilar, ya que depende de la temperatura. Para calcular la 
 temperatura:
-$$ \vartheta = \frac{v_{air}-331.3}{0.606} = 17.129 º $$
+$$ \vartheta = \frac{v_{air}-331.3}{0.606} = 17.129 \si{\celsius} $$
 Dado que el experimento se ha realizado por la noche, esa temperatura se 
-encuentra dentro de un margen adecuado. Por lo que se puede afirmar que el 
-experimento muestra unos resultados esperados.
+encuentra dentro de un margen adecuado. La temperatura medida por un termómetro 
+en la habitación es de 18 ºC. Por lo que se puede afirmar que el experimento 
+muestra unos resultados esperados.
 
 Existe un error fijo de aproximadamente un centímetro, que se debe a la 
 dificultad de centrar la regla en el centro del sensor de ultrasonidos. Sin 
@@ -506,6 +374,258 @@ Es importante mencionar, que un ajuste del error, empleando un método de
 regresión, permite esconder errores como el que ha sido detectado y corregido.  
 Por ello, se ha decidido emplear los cálculos teóricos, y si no concuerdan con 
 los esperados, averiguar que ha causado el error.
+
+\subsection{LDR}
+
+El sensor LDR permite obtener una medida de la cantidad de luz que incide sobre
+el mismo. El robot dispone de dos sensores LDR. Uno ambiental, está colocado en
+la parte superior, orientado hacia arriba. Además está cubierto por un cilindro
+cerrado de 4cm de plástico blanco. Esto le permite obtener una medida de la luz
+ambiente sin importar la dirección de donde proviene.
+
+El sensor LDR direccional, se encuentra en la parte delantera orientado al 
+frente. Este sin embargo, está encapsulado en un cilindro abierto, de caucho 
+negro mate. Lo cual le permite observar de forma direccional la luz que recibe 
+por el frente, con el objetivo de encontrar una luz.
+
+\subsubsection{LDR ambiental}
+
+Para calibrar el sensor ambiental, se realizarán algunas medidas comparando la 
+distancia a un foco de luz, y la invarianza de la orientación.
+
+964
+
+El valor medido por el sensor, está representado en un intervalo $[0, 1024)$ de 
+valores discretos. El valor 0, corresponde con un voltaje de 0V en la entrada de 
+Arduino, y 1023 con +5V.
+$$ V_0 = 5 \cdot \frac{l_0}{1023} $$
+En la figura~\ref{fig:ldr_circuito} se observa el montaje del LDR $R_2$, junto 
+con otra resistencia $R_1$ de un valor fijo de $10\si{\kohm}$.
+
+\begin{center}
+\begin{tikzpicture}
+	\draw
+		(0,0) to ++(0,-1) node[ground] {}
+		(0,0) to[R, l_=$R_1$, -*] ++(2,0)
+		to[short, -o] ++(0,-1) node[below] {$V_0$}
+		
+		(2,0) to[phR, l_=$R_2$] ++(2,0)
+		to[short, -o] ++(0, -1) node[below] {V}
+	;
+\end{tikzpicture}
+\captionof{figure}{Circuito del sensor LDR.\label{fig:ldr_circuito}}
+\end{center}
+
+Para calcular el voltaje en $V_0$:
+$$ I = \frac{V}{R_T} = \frac{V}{R_1 + R_2} $$
+$$ V_{0} = I \cdot R_1 = V \frac{R_1}{R_1+R_2} = \frac{V}{1+\frac{R_2}{R_1}}$$
+Y posteriormente el valor de $R_2$:
+$$ R_{2} = R_1 \frac{V-V_0}{V_0}$$
+La relación entre la iluminación $E$ y la resistencia $R$ viene dada 
+por\footnote{\url{http://www.brighton-webs.co.uk/electronics/light\_dependent\_resistor.aspx}}:
+$$ \frac{E_2}{E_1} = \left(\frac{R_2}{R_1}\right)^\gamma$$
+Y entre la distancia $D$ y la iluminación:
+$$ \frac{E_1}{E_2} = \left(\frac{D_2}{D_1}\right)^2$$
+De forma que, para calcular el parámetro $\gamma$:
+$$ E_2 = E_1 \cdot \left( \frac{R_2}{R_1} \right) ^\gamma \Rightarrow 
+\left(\frac{R_2}{R_1} \right)^{-\gamma} = \left(\frac{D_2}{D_1}\right)^2$$
+$$ \gamma = \frac{2 \ln \frac{D_2}{D_1} }{-\ln\frac{R_2}{R_1}} $$
+
+% TODO: Comprobar estas ecuaciones por algún libro.
+\begin{center}
+\begin{tabular}{ *{8}{|c} | }
+\hline
+$s_{r}$ & 0.20 & 0.30 & 0.40 & 0.60 & 0.80 & 1.00 & 1.20 \\ \hline
+ldr & 500 & 394 & 330 & 255 & 202 & 160 & 140 \\ \hline
+\end{tabular}
+\end{center}
+
+\subsection{Ratón}
+
+En la parte posterior, un ratón de bola permite obtener mediciones del movimiento del
+robot. Tiene un controlador EM83702BP, que dispone con dos contadores digitales que
+realizan la medición del desplazamiento en el eje $x$ e $y$.
+
+Una bola de goma se encuentra en contacto con el suelo. Al desplazar el ratón, 
+la bola gira alrededor de un eje imaginario, que es perpendicular al sentido del
+desplazamiento y paralelo al suelo.
+
+Ya que los movimientos efectuados por el robot serán los que provoquen sus dos ruedas,
+se puede determinar la posición, midiendo sólo el desplazamiento del ratón. Para ello,
+se observa en la figura~\ref{fig:giro} un ejemplo de un giro de $\alpha = \RobotAngleº$.
+
+\begin{center}
+\begin{tikzpicture}[>=latex]
+    %\path[draw] (-4,0)  coordinate [label= left:$A$] (A)
+    %        -- ( 0,4)  coordinate [label=above:$C$] (C)
+    %        -- ( 4,0)  coordinate [label=right:$B$] (B)
+    %        -- cycle;
+    %\foreach \point in {A,B,C}
+    %       \fill [black] (\point) circle (2pt);
+    %\draw [color=red] circle(4cm);
+    
+    
+    %\draw (A) rectangle (1,1);
+    
+    %\def\robotsize{(1,1)}
+    %\pgfmathsetmacro{\RobotSize}{2.0}%
+    %\pgfmathsetmacro{\RobotAngle}{-45.0}%
+    %\pgfmathsetmacro{\RobotRadius}{6.0}%
+    \pgfmathsetmacro{\RobotBall}{0.15}%
+    \pgfmathsetmacro{\RobotOC}{sqrt(\RobotSize*\RobotSize + \RobotRadius*\RobotRadius)}%
+    \pgfmathsetmacro{\RobotAngleAOC}{atan(\RobotSize/\RobotRadius)}%
+    \def\BallBeta{\RobotAngleAOC}
+        
+    
+    \fill [black] (0,0) coordinate [label=left:$O$] (O) circle (1pt);
+    \fill [black] (0:\RobotRadius) coordinate [label=below:$A_1$] (A1) circle (1pt);
+    \fill [black] (\RobotAngle:\RobotRadius) coordinate [label=above:$A_2$] (A2) circle (1pt);
+    \fill (A1) +(0,-\RobotSize) coordinate [label=below:$C_1$] (C1) circle (1pt);
+    \fill[rotate=\RobotAngle] (A2) +(0,-\RobotSize) coordinate [label=above:$C_2$] (C2) circle (1pt);
+    
+    
+    \draw[dotted] (O) -- (A1);
+    \draw[dotted] (O) -- (A2);
+    \draw[dotted] (O) -- (C1);
+    
+    % Ángulos
+    \draw[dotted] (\RobotRadius/5,0) arc (0:\RobotAngle:\RobotRadius/5.0) node[pos=0.5,auto=right]{$\alpha$};
+    \draw[dotted] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0) node[pos=0.5,auto=left]{$\beta$};
+    \draw[dotted] (A1) +(-\RobotRadius/5,0) arc (180:90+\RobotAngle/2:\RobotRadius/5.0) node[pos=0.5,auto=left]{$\gamma$};
+    
+    % Dibujar el robot en A1
+    \draw[dotted] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
+    \draw[dotted] (C1) circle(\RobotBall);
+    
+    %Dibujar el robot en A2
+    \draw[dotted,rotate=\RobotAngle] (A2) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
+    \draw[dotted] (C2) circle(\RobotBall);
+    
+   	%Trayectoria raton
+   	%\pgfmathsetmacro{\XValueArc}{\ArcRadius*cos(\ArcAngle)}%
+   	\draw[blue] (C1) arc (-\RobotAngleAOC:\RobotAngle-\RobotAngleAOC:\RobotOC) node[pos=0.5,auto=right]{$a$};
+    
+    %\draw (0,0) coordinate [label=right:$O$] (O) circle(4);
+    \draw[dotted] (A1) arc (0:\RobotAngle:\RobotRadius);
+    \draw[-latex,shorten >=1pt] (A1) -- (A2) node[pos=0.5,auto=right]{$\vec{r}$};
+    
+    %Dibujar el vector del raton
+    \draw[red,-latex,shorten >=1pt] (C1) -- +(90-\RobotAngleAOC:\RobotRadius/3) node[pos=0.5,auto=right]{$\vec{m}$};
+    
+    
+\end{tikzpicture}
+\captionof{figure}{Diagrama de un giro del robot.\label{fig:giro}}
+\end{center}
+
+El vector $ \vec{r} $ indica el movimiento que realizó el robot en línea recta.
+Conociendo el ángulo $\gamma$:
+$$ R' = \overline{OA_1} \quad R = \overline{OC_1} $$
+$$
+r_x = \begin{cases}
+		R'(1-\cos \gamma) & \text{si } \gamma < 0\\
+		-R'(1-\cos \gamma) & \text{si } \gamma > 0\\
+		0 & \text{si } \gamma = 0\\
+	\end{cases}
+$$
+$$
+r_y = \begin{cases}
+		-R'(\sin \gamma) & \text{si } \gamma < 0\\
+		R'(\sin \gamma) & \text{si } \gamma > 0\\
+		m_x & \text{si } \gamma = 0\\
+	\end{cases}
+$$
+\subsubsection{Movimiento de la bola}
+Para poder analizar el movimiento que realizará el robot, mediante la 
+información que este proporciona, es necesario conocer como varía el vector 
+$\vec{m}$ con respecto a la información proporcionada por los optocodificadores.
+
+De modo que se analiza a continuación, como el movimiento de la bola, roza en 
+los puntos $Bx$ y $By$ con los rodillos del ratón. En la figura~\ref{fig:bola} 
+se observa con detalle el mismo giro que en la figura~\ref{fig:giro}.
+\\
+\begin{center}
+\begin{tikzpicture}[>=latex]
+    \pgfmathsetmacro{\BallRadius}{3.0}%
+    \pgfmathsetmacro{\BallOptoL}{2}%
+    \pgfmathsetmacro{\BallOptoD}{0.5}%
+    \pgfmathsetmacro{\BallBeta}{atan(\RobotSize/\RobotRadius)}%
+    \pgfmathsetmacro{\BallBetaDouble}{90.0-\BallBeta*2.0}%
+    
+    \draw circle(\BallRadius);
+    \fill [black] (0,0) coordinate [label=below:$O$] (O) circle (1pt);
+    %Puntos de choque
+    \fill [black] (0,-\BallRadius) coordinate [label=below:$B_x$] (Bx) circle (1pt);
+    \fill [black] (-\BallRadius,0) coordinate [label=left:$B_y$] (By) circle (1pt);
+    %Ejes
+    \draw[dotted] (-\BallRadius,0) -- (\BallRadius,0);
+    \draw[dotted] (0,\BallRadius) -- (0,-\BallRadius);
+    %Cilindros de los ejes
+    \draw[dotted] (By) +(-\BallOptoD,-\BallOptoL) rectangle +(0,\BallOptoL);
+    \draw[dotted] (Bx) +(-\BallOptoL,-\BallOptoD) rectangle +(\BallOptoL,0);
+    %Puntos
+    \fill[black] (180-\BallBeta*2:\BallRadius) coordinate [label=above:$C_y$] (Cy) circle (1pt);
+    \draw[blue] (By) -- (Cy) node[pos=0.5,auto=right]{$d_y$};
+    \fill[black] (90-\BallBeta*2:\BallRadius) coordinate [label=right:$C_x$] (Cx) circle (1pt);
+    \draw[blue] (Bx) -- (Cx) node[pos=0.5,auto=right]{$d_x$};
+    %Ángulos
+    %\draw[dotted] (Bx) +(-90:\BallRadius/5) arc 
+%(-90:-90-\BallBeta:\BallRadius/5.0) node[pos=0,auto=left]{$\beta$};
+
+	\begin{scope}
+	\path[clip] (Bx) -- (O) -- (Cx) -- cycle;
+	\draw [dotted] (Bx) circle (\BallRadius/3);
+%	\node[right] at (Bx) +(-90:\BallRadius/5)($(O) 
+%		+(-\RobotThetaSonar/4:\SonarS/5)$) {$\theta_2$};
+	\draw [dotted] (O) circle (\BallRadius/5);
+	\node[above] at ($(Bx) +(+90-\BallBeta/2:\BallRadius/3)$) {$\beta$};
+	\end{scope}
+	\begin{scope}
+	\path[clip] (By) -- (O) -- (Cy) -- cycle;
+	\draw [dotted] (By) circle (\BallRadius/4);
+%	\node[right] at (Bx) +(-90:\BallRadius/5)($(O) 
+%		+(-\RobotThetaSonar/4:\SonarS/5)$) {$\theta_2$};
+	\draw [dotted] (O) circle (\BallRadius/5);
+	\node[right] at ($(By) +(+45-\BallBeta/2:\BallRadius/4)$) {$\delta$};
+	\end{scope}
+	\node[left] at ($(O) +(+180-\BallBeta:\BallRadius/5)$) {$\theta$};
+
+    %Dibujar el vector del raton
+    \draw[red,-latex,shorten >=1pt] (O) -- +(90-\BallBeta:\BallRadius/2) node[pos=0.5,auto=right]{$\vec{m}$};
+
+	\draw[dotted] (O) -- (Cx);
+	%\draw[dotted] (Cx) +(270.0-\BallBeta:\BallRadius/5) arc (90.0-\BallBeta:\BallBetaDouble:\BallRadius/5.0) node[auto=right]{$\beta$};
+	
+	%\draw[dotted] (O) +(\BallBetaDouble:\BallRadius/4.0) arc (\BallBetaDouble:-90.0:\BallRadius/4.0) node[auto=right,pos=0.5]{$\delta$};
+	
+	\draw[dotted] (O) -- (Cy);
+	%\draw[dotted] (O) +(90.0+\BallBetaDouble:\BallRadius/6.0) arc (90.0+\BallBetaDouble:180.0:\BallRadius/6.0) node[auto=above]{$\theta$};
+	%node[auto=left,pos=0.5]{$\theta$}
+    
+    
+    
+    
+    
+    
+\end{tikzpicture}
+\captionof{figure}{Diagrama de la bola del ratón.\label{fig:bola}}
+\end{center}
+
+La longitud $l_x$ de la circunferencia tangente a $Bx$ y $Cx$, que tiene por 
+diámetro $d_x$, es la que recorrerá el rodillo en el punto $Bx$. De modo que 
+cuando la bola de una vuelta completa, el rodillo del eje x habrá avanzado 
+exactamente $l_x$.
+
+La distancia $d_x$ es la cuerda de ángulo $\gamma$, cuya longitud es, por su 
+propia definición:
+$$ d_x = R \, \text{crd} \, \gamma = 2R \sin \frac{\gamma}{2}$$
+Además, el ángulo $\gamma = 180 - 2\beta$, pues forma un triángulo isósceles:
+$$ d_x = 2R \sin(90-\beta) = 2R\cos \beta$$
+De igual modo para $d_y$:
+$$ d_y = R \, \text{crd} \, \theta = 2R \sin \frac{\delta}{2} $$
+Sabiendo que $\delta = 90 - \beta$, por trigonometría:
+%$$ d_y =  $$ FIXME
+
+
 
 \section{Posibles errores}
 
