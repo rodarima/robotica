@@ -81,7 +81,7 @@
 %\maketitle
 \begin{center}
 \begin{huge}
-\textbf{Cucabot}
+\textbf{Coco}
 \end{huge}
 \\[10pt]
 \textbf{Rodrigo Arias Mallo}\\
@@ -96,7 +96,7 @@ rodrigo.arias@udc.es
 \begin{multicols}{2}
 
 \section{Descripción}
-Cucabot es un robot diseñado para aprender los principios básicos de la robótica.
+Coco es un robot diseñado para aprender los principios básicos de la robótica.
 Ha sido creado con la intención de reutilizar componentes de antiguos aparatos y 
 darles un nuevo uso.
 
@@ -543,87 +543,129 @@ De modo que se analiza a continuación, como el movimiento de la bola, roza en
 los puntos $Bx$ y $By$ con los rodillos del ratón. En la figura~\ref{fig:bola} 
 se observa con detalle el mismo giro que en la figura~\ref{fig:giro}.
 \\
+\\
+\\
+\\
+\\
+\\
+\\
+\\
+\\
+\\
+
+% TODO: Poner los ejes en la figura y R
+
 \begin{center}
 \begin{tikzpicture}[>=latex]
-    \pgfmathsetmacro{\BallRadius}{3.0}%
-    \pgfmathsetmacro{\BallOptoL}{2}%
-    \pgfmathsetmacro{\BallOptoD}{0.5}%
-    \pgfmathsetmacro{\BallBeta}{atan(\RobotSize/\RobotRadius)}%
-    \pgfmathsetmacro{\BallBetaDouble}{90.0-\BallBeta*2.0}%
-    
-    \draw circle(\BallRadius);
-    \fill [black] (0,0) coordinate [label=below:$O$] (O) circle (1pt);
-    %Puntos de choque
-    \fill [black] (0,-\BallRadius) coordinate [label=below:$B_x$] (Bx) circle (1pt);
-    \fill [black] (-\BallRadius,0) coordinate [label=left:$B_y$] (By) circle (1pt);
-    %Ejes
-    \draw[dotted] (-\BallRadius,0) -- (\BallRadius,0);
-    \draw[dotted] (0,\BallRadius) -- (0,-\BallRadius);
-    %Cilindros de los ejes
-    \draw[dotted] (By) +(-\BallOptoD,-\BallOptoL) rectangle +(0,\BallOptoL);
-    \draw[dotted] (Bx) +(-\BallOptoL,-\BallOptoD) rectangle +(\BallOptoL,0);
-    %Puntos
-    \fill[black] (180-\BallBeta*2:\BallRadius) coordinate [label=above:$C_y$] (Cy) circle (1pt);
-    \draw[blue] (By) -- (Cy) node[pos=0.5,auto=right]{$d_y$};
-    \fill[black] (90-\BallBeta*2:\BallRadius) coordinate [label=right:$C_x$] (Cx) circle (1pt);
-    \draw[blue] (Bx) -- (Cx) node[pos=0.5,auto=right]{$d_x$};
-    %Ángulos
-    %\draw[dotted] (Bx) +(-90:\BallRadius/5) arc 
-%(-90:-90-\BallBeta:\BallRadius/5.0) node[pos=0,auto=left]{$\beta$};
+	\pgfmathsetmacro{\BallRadius}{3.0}%
+	\pgfmathsetmacro{\BallOptoL}{2}%
+	\pgfmathsetmacro{\BallOptoD}{0.5}%
+	\pgfmathsetmacro{\BallBeta}{atan(\RobotSize/\RobotRadius)}%
+	\pgfmathsetmacro{\BallBetaDouble}{90.0-\BallBeta*2.0}%
 
-	\begin{scope}
-	\path[clip] (Bx) -- (O) -- (Cx) -- cycle;
-	\draw [dotted] (Bx) circle (\BallRadius/3);
-%	\node[right] at (Bx) +(-90:\BallRadius/5)($(O) 
-%		+(-\RobotThetaSonar/4:\SonarS/5)$) {$\theta_2$};
-	\draw [dotted] (O) circle (\BallRadius/5);
-	\node[above] at ($(Bx) +(+90-\BallBeta/2:\BallRadius/3)$) {$\beta$};
-	\end{scope}
-	\begin{scope}
-	\path[clip] (By) -- (O) -- (Cy) -- cycle;
-	\draw [dotted] (By) circle (\BallRadius/4);
-%	\node[right] at (Bx) +(-90:\BallRadius/5)($(O) 
-%		+(-\RobotThetaSonar/4:\SonarS/5)$) {$\theta_2$};
-	\draw [dotted] (O) circle (\BallRadius/5);
-	\node[right] at ($(By) +(+45-\BallBeta/2:\BallRadius/4)$) {$\delta$};
-	\end{scope}
-	\node[left] at ($(O) +(+180-\BallBeta:\BallRadius/5)$) {$\theta$};
+	\draw circle(\BallRadius);
+	\fill [black] (0,0) coordinate [label=below:$O$] (O) circle (1pt);
+	%Puntos de choque
+	\fill [black] (0,-\BallRadius) coordinate [label=below:$B_x$] (Bx) circle (1pt);
+	\fill [black] (-\BallRadius,0) coordinate [label=left:$B_y$] (By) circle (1pt);
+	%Ejes
+	\draw[dotted] (-\BallRadius,0) -- (\BallRadius,0);
+	\draw[dotted] (0,\BallRadius) -- (0,-\BallRadius);
+	%Cilindros de los ejes
+	\draw[dotted] (By) +(-\BallOptoD,-\BallOptoL) rectangle +(0,\BallOptoL);
+	\draw[dotted] (Bx) +(-\BallOptoL,-\BallOptoD) rectangle +(\BallOptoL,0);
+	%Puntos
+	\fill[black] (180-\BallBeta*2:\BallRadius) coordinate [label=above:$C_y$] (Cy) circle (1pt);
+	\draw[blue] (By) -- (Cy) node[pos=0.5,auto=right]{$d_y$};
+	\fill[black] (90-\BallBeta*2:\BallRadius) coordinate [label=right:$C_x$] (Cx) circle (1pt);
+	\draw[blue] (Bx) -- (Cx) node[pos=0.5,auto=right]{$d_x$};
+	%Ángulos
+	%\draw[dotted] (Bx) +(-90:\BallRadius/5) arc
+	%(-90:-90-\BallBeta:\BallRadius/5.0) node[pos=0,auto=left]{$\beta$};
 
-    %Dibujar el vector del raton
-    \draw[red,-latex,shorten >=1pt] (O) -- +(90-\BallBeta:\BallRadius/2) node[pos=0.5,auto=right]{$\vec{m}$};
+	%\draw[dotted,rotate=90-\BallBeta]
+	%	($0.5*(By)+0.5*(Cy)$) ellipse (1.35 and 0.15)
+	%	($0.5*(Bx)+0.5*(Cx)$) ellipse (2 and 0.15);
+	%\coordinate (C3) at ($0.5*(C1)+0.5*(C2)$)
+
+
+	% Angulos del eje x
+	\begin{scope}
+		\path[clip] (Bx) -- (O) -- (Cx) -- cycle;
+		\draw (Bx) circle (\BallRadius/3);
+		\node[above] at ($(Bx) +(+90-\BallBeta/2:\BallRadius/3)$) {$\beta$};
+		\draw (O) circle (\BallRadius/5);
+		\node[right] at ($(O) +(-\BallBeta:\BallRadius/5)$) {$\gamma$};
+	\end{scope}
+
+	%Ángulos del eje y
+	\begin{scope}
+		\path[clip] (By) -- (O) -- (Cy) -- cycle;
+		\draw (By) circle (\BallRadius/5);
+		\node[right] at ($(By) +(+45-\BallBeta/2:\BallRadius/5)$) {$\delta$};
+		\draw (O) circle (\BallRadius/5);
+		\node[left] at ($(O) +(+180-\BallBeta:\BallRadius/5)$) {$\theta$};
+	\end{scope}
+
+	%Dibujar el vector del raton
+	\draw[red,-latex,shorten >=1pt] (O) -- +(90-\BallBeta:\BallRadius/2)
+		node[pos=0.5,auto=left]{$\vec{m}$};
 
 	\draw[dotted] (O) -- (Cx);
 	%\draw[dotted] (Cx) +(270.0-\BallBeta:\BallRadius/5) arc (90.0-\BallBeta:\BallBetaDouble:\BallRadius/5.0) node[auto=right]{$\beta$};
-	
+
 	%\draw[dotted] (O) +(\BallBetaDouble:\BallRadius/4.0) arc (\BallBetaDouble:-90.0:\BallRadius/4.0) node[auto=right,pos=0.5]{$\delta$};
-	
+
 	\draw[dotted] (O) -- (Cy);
 	%\draw[dotted] (O) +(90.0+\BallBetaDouble:\BallRadius/6.0) arc (90.0+\BallBetaDouble:180.0:\BallRadius/6.0) node[auto=above]{$\theta$};
 	%node[auto=left,pos=0.5]{$\theta$}
-    
-    
-    
-    
-    
-    
+
+
+
 \end{tikzpicture}
-\captionof{figure}{Diagrama de la bola del ratón.\label{fig:bola}}
+\captionof{figure}{Diagrama de la bola del ratón. Los ejes están 
+invertidos.\label{fig:bola}}
 \end{center}
 
-La longitud $l_x$ de la circunferencia tangente a $Bx$ y $Cx$, que tiene por 
-diámetro $d_x$, es la que recorrerá el rodillo en el punto $Bx$. De modo que 
-cuando la bola de una vuelta completa, el rodillo del eje x habrá avanzado 
-exactamente $l_x$.
+\subsubsection{El giro de la bola y los optoreceptores}
+
+A continuación, trataré de averiguar cómo se mueven los rodillos del ratón, 
+cuando la bola gira. Para ello moveré el ratón en la dirección de $\vec{m}$ a 
+una velocidad uniforme y en línea recta.
+
+Los ejes están intercambiados con respecto al orden habitual de un plano. Esto 
+es debido a que el ratón está colocado en el robot como en la figura. Sin 
+embargo mantienen el sentido. Hacia arriba y derecha son positivos.
+
+El rodillo inferior, girará rozando continuamente por el punto $B_x$ a medida 
+que la bola gire. Dado que la dirección $\vec{m}$ permanece constante durante 
+este movimiento, el punto $B_x$ describirá una trayectoria circular en la 
+superficie de la bola.
+
+Llamo $l_x$ al perímetro de esta circunferencia, que es tangente a $B_x$ y $C_x$ 
+y que tiene por diámetro $d_x$. De modo que cuando la bola dé una vuelta 
+completa, el rodillo habrá avanzado exactamente $l_x$.
 
 La distancia $d_x$ es la cuerda de ángulo $\gamma$, cuya longitud es, por su 
 propia definición:
 $$ d_x = R \, \text{crd} \, \gamma = 2R \sin \frac{\gamma}{2}$$
-Además, el ángulo $\gamma = 180 - 2\beta$, pues forma un triángulo isósceles:
+Además, el ángulo $\gamma = 180º - 2\beta$, pues forma un triángulo isósceles:
 $$ d_x = 2R \sin(90-\beta) = 2R\cos \beta$$
 De igual modo para $d_y$:
-$$ d_y = R \, \text{crd} \, \theta = 2R \sin \frac{\delta}{2} $$
-Sabiendo que $\delta = 90 - \beta$, por trigonometría:
-%$$ d_y =  $$ FIXME
+$$ d_y = R \, \text{crd} \, \theta = 2R \sin \frac{\theta}{2} $$
+Sabiendo que $\theta = 180º - 2\delta$ y que $\beta = 90 - \delta$, puesto que 
+$d_x \parallel d_y$:
+$$ d_y = 2R \sin (90 - \delta) = 2R \sin \beta $$
+Finalmente, para los perímetros:
+$$ l_x = \frac{2\pi d_x}{2} = 2 \pi R\cos \beta \quad  l_y = \frac{2\pi d_y}{2} 
+= 2 \pi R\sin \beta $$
+
+Si suponemos que no hay ningún deslizamiento entre la bola y el rodillo, cuando 
+la bola avance $\vec{m}$, girará un ángulo $\theta_b$:
+$$ \theta_b = \frac{m}{R} $$
+Por cada vuelta, los rodillos recorren todo el perímetro de su eje. De modo que:
+$$ \theta_x = \frac{\theta_b l_x}{\pi d_x} \quad
+	\theta_y = \frac{\theta_b l_y}{\pi d_y}$$
 
 
 
