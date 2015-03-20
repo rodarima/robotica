@@ -125,20 +125,25 @@ a ambos lados.
 
 El sensor de ultrasonidos, permite averiguar de forma estimada la posición de un obstáculo. Para ello dispone de un emisor y un receptor de ultrasonidos colocados en la misma dirección, y posicionados en la parte delantera del robot.
 
-Para calcular la distancia del objeto, se mide el tiempo que tarda el pulso ultrasónico en viajar desde el emisor al objeto, y tras rebotar, volver al receptor.
+Para calcular la distancia al objeto, se mide el tiempo que tarda un pulso
+ultrasónico en viajar desde el emisor al objeto, y tras rebotar, volver al
+receptor.
 
-La velocidad del sonido, depende de la temperatura del aire $\vartheta$, además
+La velocidad del sonido, depende de la temperatura del aire $T_c$, además
 de otros
 factores\footnote{\url{http://en.wikipedia.org/wiki/Speed\_of\_sound\#Practical\_formula\_for\_dry\_air}}.
 Sin embargo, para una simplificación de los cálculos, se empleará la siguiente
-fórmula, asumiendo que la temperatura $\vartheta$ es la misma en todas partes:
-$$ v_{air} = 331.3 + 0.606\vartheta $$
-Por lo tanto, si $t_e$ es el tiempo que tarda el sonido en llegar desde el emisor al obstáculo, y $t_r$ el tiempo desde el obstáculo al receptor:
-$$ s_1 = v_{air} \cdot t_e $$
-$$ s_2 = v_{air} \cdot t_r $$
-Sin embargo, medimos $t$ que es $t_e+t_r$. Si suponemos que el robot esta parado cuando haga la medición, $s_1 = s_2$ y por tanto $t_e = t_r$. Finalmente, $s$ es la distancia del sensor al obstáculo:
+fórmula, asumiendo que la temperatura $T_c$ en grados Celsius es la misma en 
+todas partes:
+$$ v_{s} = 331.3 + 0.606T_c $$
+Por lo tanto, si $t_e$ es el tiempo que tarda el sonido en llegar desde el 
+emisor al obstáculo, y $t_r$ el tiempo desde el obstáculo al receptor:
+$$ s_1 = v_{s} t_e \quad s_2 = v_{s} t_r $$
+Sin embargo, medimos $t$ que es $t_e+t_r$. Si suponemos que el robot esta parado 
+cuando haga la medición, $s_1 = s_2$ y por tanto $t_e = t_r$. Finalmente, $s$ es 
+la distancia del sensor al obstáculo:
 \begin{equation}
-	s = s_1 = s_2 = v_{air}\frac{t}{2}\label{eq:air}
+	s = s_1 = s_2 = v_{s}\frac{t}{2}\label{eq:velocidad-sonido}
 \end{equation}
 Es importante mencionar que $s$ no indica la posición exacta del obstáculo, si 
 no la distancia del mismo al sensor.
@@ -253,19 +258,33 @@ Tras realizar las mediciones, se obtienen los siguientes resultados.
 \begin{center}
 \begin{tabular}{ | c | c | c | }
 \hline
-$s$ & $\theta_1$ & $\theta_2$ \\ \hline
-m    &  º &  º \\ \hline \hline
-0.20 & 30 & 27 \\ \hline
-0.30 & 30 & 27 \\ \hline
-0.40 & 31 & 28 \\ \hline
-0.50 & 28 & 26 \\ \hline
-0.60 & 30 & 28 \\ \hline
-0.80 & 31 & 29 \\ \hline
-1.00 & 29 & 29 \\ \hline
-1.20 & 30 & 28 \\ \hline \hline
-media& 29.875 & 27.75 \\ \hline
+$s$ (m) & $\theta_1(º)$ & $\theta_2(º)$ \\ \hline
+$\pm5$mm & $\pm1º$ & $\pm1º$ \\ \hline \hline
+0,20 & 30 & 27 \\ \hline
+0,30 & 30 & 27 \\ \hline
+0,40 & 31 & 28 \\ \hline
+0,50 & 28 & 26 \\ \hline
+0,60 & 30 & 28 \\ \hline
+0,80 & 31 & 29 \\ \hline
+1,00 & 29 & 29 \\ \hline
+1,20 & 30 & 28 \\ \hline
 \end{tabular}
 \end{center}
+
+Analizamos ahora la media aritmética, la desviación típica y la dispersión 
+muestral o varianza de los valores de $\theta_1$ y $\theta_2$, respectivamente:
+$$ \overline{\theta_1} = 29,875 \quad s(\theta_1) = 0,99103 \quad s^2(\theta_1) 
+= 0.98214 $$
+$$ \overline{\theta_2} = 27,75 \quad s(\theta_2) = 1,0351 \quad s^2(\theta_2) = 
+1.0714 $$
+De forma que se aproxima el valor a:
+$$ \theta_1 = 30 \pm 1º \quad \theta_2 = 28 \pm 1º $$
+$$\mu_{\theta_s} = \mu_{\theta_1} + \mu_{\theta_2} = 57,625 $$
+$$\sigma_{\theta_s} = \sqrt{\sigma_{\theta_1}^2 + \sigma_{\theta_2}^2} = 2,0261 
+$$
+Finalmente, aproximando $\theta_s$:
+$$\theta_s = 58 \pm 2º$$
+
 
 Se empleará la media de los valores de los ángulos, para reducir los errores que
 se pudieran producir en las medidas de los mismos, quedando $\theta_1 = 29.875
@@ -279,7 +298,7 @@ $$\theta_{sonar} = \theta_1 + \theta_2 = 57.625 º $$
 Para completar la calibración, es necesario poder calcular la distancia $s$,
 sabiendo el tiempo $t$. Para ello, se realizará otro experimento, midiendo las
 distancias de forma manual $s_r$ con una regla, y comparándolas con el valor
-teórico $s_t$, calculado con la ecuación~\ref{eq:air}.
+teórico $s_t$, calculado con la ecuación~\ref{eq:velocidad-sonido}.
 
 \begin{center}
 \begin{tabular}{ | c | c | c | }
@@ -354,13 +373,13 @@ Y por tanto, la recta característica es:
 $$ s = 170.84 t + 1.0857\cdot 10^{-2} = 341.68\frac{t}{2} + 1.0857\cdot 10^{-2}
 $$
 
-Si la comparamos con la ecuación~\ref{eq:air}, se puede observar que es muy 
-similar a lo esperado.
+Si la comparamos con la ecuación~\ref{eq:velocidad-sonido}, se puede observar 
+que es muy similar a lo esperado.
 
-La velocidad del sonido calculada de forma experimental, resulta ser 341.68 m/s.  
+La velocidad del sonido calculada de forma experimental, resulta ser 341,68 m/s.  
 Este valor puede oscilar, ya que depende de la temperatura. Para calcular la 
 temperatura:
-$$ \vartheta = \frac{v_{air}-331.3}{0.606} = 17.129 \si{\celsius} $$
+$$ T = \frac{v_{s}-331.3}{0.606} = 17.129 \si{\celsius} $$
 Dado que el experimento se ha realizado por la noche, esa temperatura se 
 encuentra dentro de un margen adecuado. La temperatura medida por un termómetro 
 en la habitación es de 18 ºC. Por lo que se puede afirmar que el experimento 
@@ -422,7 +441,7 @@ $$ I = \frac{V}{R_T} = \frac{V}{R_1 + R_2} $$
 $$ V_{0} = I \cdot R_1 = V \frac{R_1}{R_1+R_2} = \frac{V}{1+\frac{R_2}{R_1}}$$
 Y posteriormente el valor de $R_2$:
 $$ R_{2} = R_1 \frac{V-V_0}{V_0}$$
-La relación entre la iluminación $E$ y la resistencia $R$ viene dada 
+La relación entre la iluminación $I_V$ y la resistencia $R$ viene dada 
 por\footnote{\url{http://www.brighton-webs.co.uk/electronics/light\_dependent\_resistor.aspx}}:
 $$ \frac{E_2}{E_1} = \left(\frac{R_2}{R_1}\right)^\gamma$$
 Y entre la distancia $D$ y la iluminación:
