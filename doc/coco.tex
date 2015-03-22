@@ -116,14 +116,16 @@ como información sobre sí mismo. Son los siguientes:
 \end{enumerate}
 
 \subsection{Motores}
-Para efectuar el movimiento, dispone de dos motores Mabuchi RF-500TB-12560, colocados
-a ambos lados.
+Para efectuar el movimiento, dispone de dos motores Mabuchi RF-500TB-12560, 
+colocados a ambos lados.
 
 
 \section{Calibración de sensores}
 \subsection{Ultrasonidos HC-SR04}
 
-El sensor de ultrasonidos, permite averiguar de forma estimada la posición de un obstáculo. Para ello dispone de un emisor y un receptor de ultrasonidos colocados en la misma dirección, y posicionados en la parte delantera del robot.
+El sensor de ultrasonidos, permite averiguar de forma estimada la posición de un
+obstáculo. Para ello dispone de un emisor y un receptor de ultrasonidos
+colocados en la misma dirección, y posicionados en la parte delantera del robot.
 
 Para calcular la distancia al objeto, se mide el tiempo que tarda un pulso
 ultrasónico en viajar desde el emisor al objeto, y tras rebotar, volver al
@@ -169,20 +171,20 @@ y $\theta_2$, para luego estimar $\theta_{sonar}$.
 	\pgfmathsetmacro{\SonarS}{6}
 	\pgfmathsetmacro{\Obstacle}{1}
 	\pgfmathsetmacro{\RobotSemiTheta}{\RobotThetaSonar/2.0}
-    \pgfmathsetmacro{\RobotBall}{0.15}%
-    \pgfmathsetmacro{\RobotOC}{sqrt(\RobotSize*\RobotSize + \RobotRadius*\RobotRadius)}%
-    \pgfmathsetmacro{\RobotAngleAOC}{atan(\RobotSize/\RobotRadius)}%
-    \def\BallBeta{\RobotAngleAOC}
-        
-    
-    \fill [black] (0,0) coordinate [label=left:$O$] (O) circle (1pt);
-    \coordinate (X) at (\SonarS/4,0);
-    \fill [black] (-\RobotThetaSonar/2:\SonarS) coordinate [label=right:$A_1$] (A1) circle (1pt);
-    \fill [black] (\RobotThetaSonar/2:\SonarS) coordinate [label=right:$A_2$] (A2) circle (1pt);
-        \fill [black] (\RobotThetaSonar/4:\SonarS) coordinate [label=right:$C_1$] (C1) circle (1pt);
-        \fill [black] (\RobotThetaSonar*3/4:\SonarS) coordinate [label=right:$C_2$] (C2) circle (1pt);
-%    \fill (A1) +(0,-\RobotSize) coordinate [label=below:$C_1$] (C1) circle (1pt);
-%    \fill[rotate=\RobotAngle] (A2) +(0,-\RobotSize) coordinate [label=above:$C_2$] (C2) circle (1pt);
+	\pgfmathsetmacro{\RobotBall}{0.15}%
+	\pgfmathsetmacro{\RobotOC}{sqrt(\RobotSize*\RobotSize + \RobotRadius*\RobotRadius)}%
+	\pgfmathsetmacro{\RobotAngleAOC}{atan(\RobotSize/\RobotRadius)}%
+	\def\BallBeta{\RobotAngleAOC}
+
+
+	\fill [black] (0,0) coordinate [label=left:$O$] (O) circle (1pt);
+	\coordinate (X) at (\SonarS/4,0);
+	\fill [black] (-\RobotThetaSonar/2:\SonarS) coordinate [label=right:$A_1$] (A1) circle (1pt);
+	\fill [black] (\RobotThetaSonar/2:\SonarS) coordinate [label=right:$A_2$] (A2) circle (1pt);
+	\fill [black] (\RobotThetaSonar/4:\SonarS) coordinate [label=right:$C_1$] (C1) circle (1pt);
+	\fill [black] (\RobotThetaSonar*3/4:\SonarS) coordinate [label=right:$C_2$] (C2) circle (1pt);
+	%    \fill (A1) +(0,-\RobotSize) coordinate [label=below:$C_1$] (C1) circle (1pt);
+	%    \fill[rotate=\RobotAngle] (A2) +(0,-\RobotSize) coordinate [label=above:$C_2$] (C2) circle (1pt);
 
 	%(-\RobotThetaSonar/2:30:\SonarS) node[pos=0.5,auto=right]{$a$};
 
@@ -191,24 +193,24 @@ y $\theta_2$, para luego estimar $\theta_{sonar}$.
 
 	% Pintar objeto 2
 	\draw[dotted,rotate=\RobotThetaSonar*3/4] (C2) +(0,\Obstacle/2) rectangle +(\Obstacle,-\Obstacle/2);
-    
-    \draw (O) -- (A1);
-    \draw (O) -- (A2);
-    \draw[dotted] (O) -- (X);
-    %\draw[dotted] (O) -- (C1);
+
+	\draw (O) -- (A1);
+	\draw (O) -- (A2);
+	\draw[dotted] (O) -- (X);
+	%\draw[dotted] (O) -- (C1);
 
 	%Dibujar arco del campo de visión
 	\draw[dotted] (A2) arc[
 		start angle=\RobotThetaSonar/2,
 		delta angle=-\RobotThetaSonar,
 		radius=\SonarS];
-	
+
 	% Pintar el vector s
 	%\draw[red,-latex,shorten >=1pt] (O) -- (C1)
 	%	node[pos=0.5,auto=left]{$\vec{s}$};
 	\draw[red] (O) -- (C1)
 		node[pos=0.5,auto=left]{$s$};
-    
+
 	% Ángulos
 	\begin{scope}
 		\path[clip] (A1) -- (O) -- (A2) -- cycle;
@@ -221,34 +223,6 @@ y $\theta_2$, para luego estimar $\theta_{sonar}$.
 		\node[right] at ($(O) +(-\RobotThetaSonar/4:\SonarS/5)$) {$\theta_2$};
 	\end{scope}
 
-
-		
-    
-    % Ángulos
-    %\draw[red] (\RobotRadius/5,0) arc (0:\RobotAngle:\RobotRadius/5.0) node[pos=0.5,auto=right]{$\theta_{sonar}$};
-    %\draw[dotted] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0) node[pos=0.5,auto=left]{$\beta$};
-    %\draw[dotted] (A1) +(-\RobotRadius/5,0) arc (180:90+\RobotAngle/2:\RobotRadius/5.0) node[pos=0.5,auto=left]{$\gamma$};
-    
-    % Dibujar el robot en A1
-    %\draw[dotted] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
-    %\draw[dotted] (C1) circle(\RobotBall);
-    
-    %Dibujar el robot en A2
-    %\draw[dotted,rotate=\RobotAngle] (A2) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
-    %\draw[dotted] (C2) circle(\RobotBall);
-    
-   	%Trayectoria raton
-   	%\pgfmathsetmacro{\XValueArc}{\ArcRadius*cos(\ArcAngle)}%
-   	%\draw[blue] (C1) arc (-\RobotAngleAOC:\RobotAngle-\RobotAngleAOC:\RobotOC) node[pos=0.5,auto=right]{$a$};
-    
-    %\draw (0,0) coordinate [label=right:$O$] (O) circle(4);
-    %\draw[dotted] (A1) arc (0:\RobotAngle:\RobotRadius);
-    %\draw[-latex,shorten >=1pt] (A1) -- (A2) node[pos=0.5,auto=right]{$\vec{r}$};
-    
-    %Dibujar el vector del raton
-    %\draw[red,-latex,shorten >=1pt] (C1) -- +(90-\RobotAngleAOC:\RobotRadius/3) node[pos=0.5,auto=right]{$\vec{m}$};
-    
-    
 \end{tikzpicture}
 \captionof{figure}{Sensor de ultrasonido.\label{fig:sonar}}
 \end{center}
@@ -410,53 +384,94 @@ por el frente, con el objetivo de encontrar una luz.
 
 \subsubsection{LDR ambiental}
 
-Para calibrar el sensor ambiental, se realizarán algunas medidas comparando la 
-distancia a un foco de luz, y la invarianza de la orientación.
+%Para calibrar el sensor ambiental, se realizarán algunas medidas comparando la 
+%distancia a un foco de luz, y la invarianza de la orientación.
+%
+%964
+%
+%El valor medido por el sensor, está representado en un intervalo $[0, 1024)$ de 
+%valores discretos. El valor 0, corresponde con un voltaje de 0V en la entrada de 
+%Arduino, y 1023 con +5V.
+%$$ V_0 = 5 \cdot \frac{l_0}{1023} $$
+%En la figura~\ref{fig:ldr_circuito} se observa el montaje del LDR $R_2$, junto 
+%con otra resistencia $R_1$ de un valor fijo de $10\si{\kohm}$.
+%
+%\begin{center}
+%\begin{tikzpicture}
+%	\draw
+%		(0,0) to ++(0,-1) node[ground] {}
+%		(0,0) to[R, l_=$R_1$, -*] ++(2,0)
+%		to[short, -o] ++(0,-1) node[below] {$V_0$}
+%
+%		(2,0) to[phR, l_=$R_2$] ++(2,0)
+%		to[short, -o] ++(0, -1) node[below] {V}
+%	;
+%\end{tikzpicture}
+%\captionof{figure}{Circuito del sensor LDR.\label{fig:ldr_circuito}}
+%\end{center}
+%
+%Para calcular el voltaje en $V_0$:
+%$$ I = \frac{V}{R_T} = \frac{V}{R_1 + R_2} $$
+%$$ V_{0} = I \cdot R_1 = V \frac{R_1}{R_1+R_2} = \frac{V}{1+\frac{R_2}{R_1}}$$
+%Y posteriormente el valor de $R_2$:
+%$$ R_{2} = R_1 \frac{V-V_0}{V_0}$$
+%La relación entre la iluminación $I_V$ y la resistencia $R$ viene dada 
+%por\footnote{\url{http://www.brighton-webs.co.uk/electronics/light\_dependent\_resistor.aspx}}:
+%$$ \frac{E_2}{E_1} = \left(\frac{R_2}{R_1}\right)^\gamma$$
+%Y entre la distancia $D$ y la iluminación:
+%$$ \frac{E_1}{E_2} = \left(\frac{D_2}{D_1}\right)^2$$
+%De forma que, para calcular el parámetro $\gamma$:
+%$$ E_2 = E_1 \cdot \left( \frac{R_2}{R_1} \right) ^\gamma \Rightarrow 
+%\left(\frac{R_2}{R_1} \right)^{-\gamma} = \left(\frac{D_2}{D_1}\right)^2$$
+%$$ \gamma = \frac{2 \ln \frac{D_2}{D_1} }{-\ln\frac{R_2}{R_1}} $$
+%
+%% TODO: Comprobar estas ecuaciones por algún libro.
 
-964
 
-El valor medido por el sensor, está representado en un intervalo $[0, 1024)$ de 
-valores discretos. El valor 0, corresponde con un voltaje de 0V en la entrada de 
-Arduino, y 1023 con +5V.
-$$ V_0 = 5 \cdot \frac{l_0}{1023} $$
-En la figura~\ref{fig:ldr_circuito} se observa el montaje del LDR $R_2$, junto 
-con otra resistencia $R_1$ de un valor fijo de $10\si{\kohm}$.
+Para calibrar el sensor ambiental, se realizarán algunas medidas observando el 
+valor de la resistencia del LDR, mientras se varía la distancia del foco de luz, 
+así como el ángulo.
+
+En cada medida, el sensor realiza 5000 mediciones de forma contínua, y luego 
+envía el valor de la media aritmética al ordenador, que es registrado.
 
 \begin{center}
-\begin{tikzpicture}
-	\draw
-		(0,0) to ++(0,-1) node[ground] {}
-		(0,0) to[R, l_=$R_1$, -*] ++(2,0)
-		to[short, -o] ++(0,-1) node[below] {$V_0$}
-		
-		(2,0) to[phR, l_=$R_2$] ++(2,0)
-		to[short, -o] ++(0, -1) node[below] {V}
-	;
-\end{tikzpicture}
-\captionof{figure}{Circuito del sensor LDR.\label{fig:ldr_circuito}}
+\begin{tabular}{ | c | c | c | c | c | }
+\hline
+$t$ & $0º$ & $-90º$ & $+90º$ & $+180º$ \\ \hline
+0.20 & 936 & 926 & 933 & 943 \\ \hline
+0.40 & 823 & 784 & 831 & 843 \\ \hline
+0.60 & 719 & 675 & 729 & 742 \\ \hline
+0.80 & 627 & 576 & 628 & 639 \\ \hline
+1.00 & 555 & 505 & 560 & 531 \\ \hline
+1.20 & 500 & 445 & 497 & 489 \\ \hline
+1.40 & 429 & 396 & 446 & 454 \\ \hline
+1.60 & 396 & 340 & 407 & 440 \\ \hline
+1.80 & 378 & 296 & 383 & 405 \\ \hline
+\end{tabular}
 \end{center}
 
-Para calcular el voltaje en $V_0$:
-$$ I = \frac{V}{R_T} = \frac{V}{R_1 + R_2} $$
-$$ V_{0} = I \cdot R_1 = V \frac{R_1}{R_1+R_2} = \frac{V}{1+\frac{R_2}{R_1}}$$
-Y posteriormente el valor de $R_2$:
-$$ R_{2} = R_1 \frac{V-V_0}{V_0}$$
-La relación entre la iluminación $I_V$ y la resistencia $R$ viene dada 
-por\footnote{\url{http://www.brighton-webs.co.uk/electronics/light\_dependent\_resistor.aspx}}:
-$$ \frac{E_2}{E_1} = \left(\frac{R_2}{R_1}\right)^\gamma$$
-Y entre la distancia $D$ y la iluminación:
-$$ \frac{E_1}{E_2} = \left(\frac{D_2}{D_1}\right)^2$$
-De forma que, para calcular el parámetro $\gamma$:
-$$ E_2 = E_1 \cdot \left( \frac{R_2}{R_1} \right) ^\gamma \Rightarrow 
-\left(\frac{R_2}{R_1} \right)^{-\gamma} = \left(\frac{D_2}{D_1}\right)^2$$
-$$ \gamma = \frac{2 \ln \frac{D_2}{D_1} }{-\ln\frac{R_2}{R_1}} $$
-
-% TODO: Comprobar estas ecuaciones por algún libro.
 \begin{center}
 \begin{tabular}{ *{8}{|c} | }
 \hline
 $s_{r}$ & 0.20 & 0.30 & 0.40 & 0.60 & 0.80 & 1.00 & 1.20 \\ \hline
 ldr & 500 & 394 & 330 & 255 & 202 & 160 & 140 \\ \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{ | c | c | c | c | c | }
+\hline
+$t$ & $0º$ & $30º$ & $60º$ & $90º$ \\ \hline
+0.20 & 1014 & 1008 & 829 & 620 \\ \hline
+0.40 & 1008 & 898 & 718 & 455 \\ \hline
+0.60 & 999 & 559 &  & 434 \\ \hline
+0.80 & 993 & 536 &  & 374 \\ \hline
+1.00 & 998 & 497 &  & 177 \\ \hline
+1.20 & 979 & 473 &  & 123 \\ \hline
+1.40 & 959 & 370 &  &  \\ \hline
+1.60 & 954 &  &  &  \\ \hline
+1.80 & 938 &  &  &  \\ \hline
 \end{tabular}
 \end{center}
 
@@ -476,63 +491,74 @@ se observa en la figura~\ref{fig:giro} un ejemplo de un giro de $\alpha = \Robot
 
 \begin{center}
 \begin{tikzpicture}[>=latex]
-    %\path[draw] (-4,0)  coordinate [label= left:$A$] (A)
-    %        -- ( 0,4)  coordinate [label=above:$C$] (C)
-    %        -- ( 4,0)  coordinate [label=right:$B$] (B)
-    %        -- cycle;
-    %\foreach \point in {A,B,C}
-    %       \fill [black] (\point) circle (2pt);
-    %\draw [color=red] circle(4cm);
-    
-    
-    %\draw (A) rectangle (1,1);
-    
-    %\def\robotsize{(1,1)}
-    %\pgfmathsetmacro{\RobotSize}{2.0}%
-    %\pgfmathsetmacro{\RobotAngle}{-45.0}%
-    %\pgfmathsetmacro{\RobotRadius}{6.0}%
-    \pgfmathsetmacro{\RobotBall}{0.15}%
-    \pgfmathsetmacro{\RobotOC}{sqrt(\RobotSize*\RobotSize + \RobotRadius*\RobotRadius)}%
-    \pgfmathsetmacro{\RobotAngleAOC}{atan(\RobotSize/\RobotRadius)}%
-    \def\BallBeta{\RobotAngleAOC}
-        
-    
-    \fill [black] (0,0) coordinate [label=left:$O$] (O) circle (1pt);
-    \fill [black] (0:\RobotRadius) coordinate [label=below:$A_1$] (A1) circle (1pt);
-    \fill [black] (\RobotAngle:\RobotRadius) coordinate [label=above:$A_2$] (A2) circle (1pt);
-    \fill (A1) +(0,-\RobotSize) coordinate [label=below:$C_1$] (C1) circle (1pt);
-    \fill[rotate=\RobotAngle] (A2) +(0,-\RobotSize) coordinate [label=above:$C_2$] (C2) circle (1pt);
-    
-    
-    \draw[dotted] (O) -- (A1);
-    \draw[dotted] (O) -- (A2);
-    \draw[dotted] (O) -- (C1);
-    
-    % Ángulos
-    \draw[dotted] (\RobotRadius/5,0) arc (0:\RobotAngle:\RobotRadius/5.0) node[pos=0.5,auto=right]{$\alpha$};
-    \draw[dotted] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0) node[pos=0.5,auto=left]{$\beta$};
-    \draw[dotted] (A1) +(-\RobotRadius/5,0) arc (180:90+\RobotAngle/2:\RobotRadius/5.0) node[pos=0.5,auto=left]{$\gamma$};
-    
-    % Dibujar el robot en A1
-    \draw[dotted] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
-    \draw[dotted] (C1) circle(\RobotBall);
-    
-    %Dibujar el robot en A2
-    \draw[dotted,rotate=\RobotAngle] (A2) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
-    \draw[dotted] (C2) circle(\RobotBall);
-    
-   	%Trayectoria raton
-   	%\pgfmathsetmacro{\XValueArc}{\ArcRadius*cos(\ArcAngle)}%
-   	\draw[blue] (C1) arc (-\RobotAngleAOC:\RobotAngle-\RobotAngleAOC:\RobotOC) node[pos=0.5,auto=right]{$a$};
-    
-    %\draw (0,0) coordinate [label=right:$O$] (O) circle(4);
-    \draw[dotted] (A1) arc (0:\RobotAngle:\RobotRadius);
-    \draw[-latex,shorten >=1pt] (A1) -- (A2) node[pos=0.5,auto=right]{$\vec{r}$};
-    
-    %Dibujar el vector del raton
-    \draw[red,-latex,shorten >=1pt] (C1) -- +(90-\RobotAngleAOC:\RobotRadius/3) node[pos=0.5,auto=right]{$\vec{m}$};
-    
-    
+	%\path[draw] (-4,0)  coordinate [label= left:$A$] (A)
+	%        -- ( 0,4)  coordinate [label=above:$C$] (C)
+%        -- ( 4,0)  coordinate [label=right:$B$] (B)
+	%        -- cycle;
+	%\foreach \point in {A,B,C}
+	%       \fill [black] (\point) circle (2pt);
+	%\draw [color=red] circle(4cm);
+
+
+	%\draw (A) rectangle (1,1);
+
+	%\def\robotsize{(1,1)}
+	%\pgfmathsetmacro{\RobotSize}{2.0}%
+	%\pgfmathsetmacro{\RobotAngle}{-45.0}%
+	%\pgfmathsetmacro{\RobotRadius}{6.0}%
+	\pgfmathsetmacro{\RobotBall}{0.15}%
+	\pgfmathsetmacro{\RobotOC}{sqrt(\RobotSize*\RobotSize +
+		\RobotRadius*\RobotRadius)}%
+	\pgfmathsetmacro{\RobotAngleAOC}{atan(\RobotSize/\RobotRadius)}%
+	\def\BallBeta{\RobotAngleAOC}
+
+
+	\fill [black] (0,0) coordinate [label=left:$O$] (O) circle (1pt);
+	\fill [black] (0:\RobotRadius) coordinate [label=below:$A_1$] (A1)
+		circle (1pt);
+	\fill [black] (\RobotAngle:\RobotRadius) coordinate [label=above:$A_2$] (A2)
+		circle (1pt);
+	\fill (A1) +(0,-\RobotSize) coordinate [label=below:$C_1$] (C1) circle (1pt);
+	\fill[rotate=\RobotAngle] (A2) +(0,-\RobotSize) coordinate [label=above:$C_2$]
+		(C2) circle (1pt);
+
+
+	\draw[dotted] (O) -- (A1);
+	\draw[dotted] (O) -- (A2);
+	\draw[dotted] (O) -- (C1);
+
+	% Ángulos
+	\draw[dotted] (\RobotRadius/5,0) arc (0:\RobotAngle:\RobotRadius/5.0)
+		node[pos=0.5,auto=right]{$\alpha$};
+	\draw[dotted] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0)
+		node[pos=0.5,auto=left]{$\beta$};
+	\draw[dotted] (A1) +(-\RobotRadius/5,0)
+		arc (180:90+\RobotAngle/2:\RobotRadius/5.0)
+		node[pos=0.5,auto=left]{$\gamma$};
+
+	% Dibujar el robot en A1
+	\draw[dotted] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
+	\draw[dotted] (C1) circle(\RobotBall);
+
+	%Dibujar el robot en A2
+	\draw[dotted,rotate=\RobotAngle] (A2) +(-\RobotSize/2,0)
+		rectangle +(\RobotSize/2,-\RobotSize);
+	\draw[dotted] (C2) circle(\RobotBall);
+
+	%Trayectoria raton
+	%\pgfmathsetmacro{\XValueArc}{\ArcRadius*cos(\ArcAngle)}%
+	\draw[blue] (C1) arc (-\RobotAngleAOC:\RobotAngle-\RobotAngleAOC:\RobotOC)
+		node[pos=0.5,auto=right]{$a$};
+
+	%\draw (0,0) coordinate [label=right:$O$] (O) circle(4);
+	\draw[dotted] (A1) arc (0:\RobotAngle:\RobotRadius);
+	\draw[-latex,shorten >=1pt] (A1) -- (A2) node[pos=0.5,auto=right]{$\vec{r}$};
+
+	%Dibujar el vector del raton
+	\draw[red,-latex,shorten >=1pt] (C1) -- +(90-\RobotAngleAOC:\RobotRadius/3)
+		node[pos=0.5,auto=right]{$\vec{m}$};
+
+
 \end{tikzpicture}
 \captionof{figure}{Diagrama de un giro del robot.\label{fig:giro}}
 \end{center}
@@ -562,16 +588,6 @@ $\vec{m}$ con respecto a la información proporcionada por los optocodificadores
 De modo que se analiza a continuación, como el movimiento de la bola, roza en 
 los puntos $Bx$ y $By$ con los rodillos del ratón. En la figura~\ref{fig:bola} 
 se observa con detalle el mismo giro que en la figura~\ref{fig:giro}.
-\\
-\\
-\\
-\\
-\\
-\\
-\\
-\\
-\\
-\\
 
 % TODO: Poner los ejes en la figura y R
 
