@@ -1,5 +1,5 @@
 % Usar el tipo de documento: Artículo científico.
-\documentclass[10pt,a4paper,hidelinks]{article}
+\documentclass[10pt,a4paper,hidelinks,twocolumn]{article}
 
 % Cargar mensajes en español.
 \usepackage[spanish,es-noquoting]{babel}
@@ -10,7 +10,7 @@
 \usepackage{lmodern}
 
 % Usar dos columnas
-\usepackage{multicol}
+%\usepackage{multicol}
 
 % Separar las columnas
 \setlength{\columnsep}{1cm}
@@ -50,6 +50,18 @@
 % Dibujos geométricos
 \usepackage{tikz}
 \usetikzlibrary{through,calc,arrows,angles,babel}
+
+% Gráficas con pgf
+\usepackage{pgfplots}
+
+\pgfplotsset{compat=newest} % Allows to place the legend below plot
+\usepgfplotslibrary{units} % Allows to enter the units nicely
+
+\sisetup{
+	round-mode          = places,
+	round-precision     = 2,
+}
+
 
 \newcommand\markangle[6][red]{% [color] {X} {origin} {Y} {mark} {radius}
 	% filled circle: red by default
@@ -93,7 +105,7 @@ rodrigo.arias@udc.es
 \newcommand\RobotRadius{4}
 \newcommand\RobotThetaSonar{60.0}
 
-\begin{multicols}{2}
+%\begin{multicols}{2}
 
 \section{Descripción}
 Coco es un robot diseñado para aprender los principios básicos de la robótica.
@@ -103,59 +115,77 @@ aplicados en un experimento práctico.
 
 \subsection{Sensores}
 Cuenta con varios sensores que le permiten obtener información del entorno, así
-como información sobre sí mismo. Son los siguientes:
+como información sobre sí mismo. A cada sensor se le asigna un nombre corto, 
+terminado en un número, que permite identificarlo. Los sensores son los 
+siguientes:
 
 \begin{enumerate}
 	% Quitar espacio entre lineas
 	\setlength{\parskip}{0cm}
 
-	\item Sensor de ultrasonidos HC-SR04
-	\item Ratón de bola
-	\item Sensor de luz LDR dirigido hacia delante
-	\item Sensor de luz LDR ambiental
+	\item \texttt{sonar0}: Sensor de ultrasonidos HC-SR04
+	\item \texttt{mouse0}: Ratón de bola
+	\item \texttt{ldr0}: Sensor de luz LDR ambiental
+	\item \texttt{ldr1}: Sensor de luz LDR dirigido hacia delante
 \end{enumerate}
 
-\subsection{Motores}
-Para efectuar el movimiento, dispone de dos motores Mabuchi RF-500TB-12560, 
-colocados a ambos lados.
-
+%\subsection{Motores}
+%Para efectuar el movimiento, dispone de dos motores Mabuchi RF-500TB-12560, 
+%colocados a ambos lados.
+%TODO: Completar descripción
 
 \section{Calibración de sensores}
-\subsection{Ultrasonidos HC-SR04}
+\subsection{\texttt{sonar0}: Ultrasonidos HC-SR04}
 
-El sensor de ultrasonidos, permite averiguar de forma estimada la posición de un
-obstáculo. Para ello dispone de un emisor y un receptor de ultrasonidos
-colocados en la misma dirección, y posicionados en la parte delantera del robot.
+El sensor de ultrasonidos, permite averiguar de forma estimada la posición de un 
+obstáculo. Para ello dispone de un emisor y un receptor de ultrasonidos 
+orientados hacia delante, y posicionados en la parte frontal del robot.
 
-Para calcular la distancia al objeto, se mide el tiempo que tarda un pulso
-ultrasónico en viajar desde el emisor al objeto, y tras rebotar, volver al
+Para calcular la distancia al objeto, se mide el tiempo que tarda un pulso 
+ultrasónico en viajar desde el emisor al objeto, y tras rebotar, volver al 
 receptor.
 
-La velocidad del sonido, depende de la temperatura del aire $T_c$, además
-de otros
+Ya que el sonido ha de rebotar en el objeto, la superficie del mismo influirá en 
+gran medida en la información captada por el sensor. Las superfies de tela o 
+espuma, absorben casi todo el sonido que emite el sensor, por lo que son 
+indetectables para el robot.
+
+La velocidad del sonido, depende de la temperatura del aire $T$, además de otros
 factores\footnote{\url{http://en.wikipedia.org/wiki/Speed\_of\_sound\#Practical\_formula\_for\_dry\_air}}.
 Sin embargo, para una simplificación de los cálculos, se empleará la siguiente
-fórmula, asumiendo que la temperatura $T_c$ en grados Celsius es la misma en 
-todas partes:
-$$ v_{s} = 331.3 + 0.606T_c $$
-Por lo tanto, si $t_e$ es el tiempo que tarda el sonido en llegar desde el 
-emisor al obstáculo, y $t_r$ el tiempo desde el obstáculo al receptor:
-$$ s_1 = v_{s} t_e \quad s_2 = v_{s} t_r $$
-Sin embargo, medimos $t$ que es $t_e+t_r$. Si suponemos que el robot esta parado 
-cuando haga la medición, $s_1 = s_2$ y por tanto $t_e = t_r$. Finalmente, $s$ es 
-la distancia del sensor al obstáculo:
+fórmula, asumiendo que la temperatura $T$ en grados Celsius es la misma en todas 
+partes:
 \begin{equation}
-	s = s_1 = s_2 = v_{s}\frac{t}{2}\label{eq:velocidad-sonido}
+	v_{s} = 331.3 + 0.606T \label{eq:velocidad-sonido}
+\end{equation}
+Por lo tanto, si $t_e$ es el tiempo que tarda el sonido en llegar desde el 
+emisor al obstáculo, y $t_r$ el tiempo desde que rebota en el obstáculo hasta el 
+receptor:
+$$ s_1 = v_{s} t_e \quad s_2 = v_{s} t_r $$
+$s_1$ es la distancia del sensor al objeto, en el momento de lanzar el pulso.  
+$s_2$ es la distancia desde el objeto al robot, que puede estar en movimiento y 
+ser diferente a $s_1$. El sensor mide $t$ que es $t_e+t_r$.
+
+Si se supone que el robot esta parado cuando se realiza la medición, $s_1 = s_2$ 
+y por tanto $t_e = t_r$. Finalmente, $s$ es la distancia del sensor al 
+obstáculo:
+\begin{equation}
+	s = s_1 = s_2 = v_{s}\frac{t}{2}\label{eq:velocidad-tiempo}
 \end{equation}
 Es importante mencionar que $s$ no indica la posición exacta del obstáculo, si 
 no la distancia del mismo al sensor.
 
-\subsubsection{Ángulo de apertura $\theta_{sonar}$}
+En el caso de que el robot se mueva con una velocidad $\vec{v}$, si esta 
+velocidad es pequeña comparada con la del sonido, se puede despreciar. Una 
+velocidad de 1m/s, provocaría una diferencia en la distancia estimada de un 
+objeto a 3m, de aproximadamente 9mm.
+
+\subsubsection{Ángulo de apertura $\theta_{s}$}
 Para calibrar el sensor, es necesario determinar el ángulo de apertura 
-$\theta_{sonar}$, que indica hasta que punto el sensor puede recibir el eco del 
-sonido. De modo que se realizarán una serie de experimentos, que indicarán de 
-forma experimental dicho ángulo. En la figura~\ref{fig:sonar} se observa un
-esquema del experimento.
+$\theta_{s}$, que indica hasta que punto el sensor puede recibir el eco del 
+sonido que rebota en los objetos. De modo que se realizarán una serie de 
+experimentos, que indicarán de forma experimental dicho ángulo. En la 
+figura~\ref{fig:sonar} se observa un esquema del experimento.
 
 Primero un objeto se coloca en el campo de visión del sensor, en $C_1$. Luego se 
 desplaza hacia $A_2$, siguiendo una trayectoria circular centrada en $O$, y se 
@@ -163,10 +193,12 @@ observa el ángulo $\theta_1$ en el que deja de observarse dicho objeto. De igua
 modo se repite en el otro sentido, y se calcula el ángulo $\theta_{2}$.
 
 Dado que el sonar puede no estar centrado, se anotarán las medidas de $\theta_1$
-y $\theta_2$, para luego estimar $\theta_{sonar}$.
+y $\theta_2$, para luego estimar $\theta_{s}$.
 
-\begin{center}
-\begin{tikzpicture}[>=latex]
+%\begin{center}
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[>=latex,semithick]
 
 	\pgfmathsetmacro{\SonarS}{6}
 	\pgfmathsetmacro{\Obstacle}{1}
@@ -189,10 +221,12 @@ y $\theta_2$, para luego estimar $\theta_{sonar}$.
 	%(-\RobotThetaSonar/2:30:\SonarS) node[pos=0.5,auto=right]{$a$};
 
 	% Pintar objeto 1
-	\draw[dotted,rotate=\RobotThetaSonar/4] (C1) +(0,\Obstacle/2) rectangle +(\Obstacle,-\Obstacle/2);
+	\draw[rotate=\RobotThetaSonar/4] (C1) +(0,\Obstacle/2) rectangle
+		+(\Obstacle,-\Obstacle/2);
 
 	% Pintar objeto 2
-	\draw[dotted,rotate=\RobotThetaSonar*3/4] (C2) +(0,\Obstacle/2) rectangle +(\Obstacle,-\Obstacle/2);
+	\draw[rotate=\RobotThetaSonar*3/4] (C2) +(0,\Obstacle/2) rectangle
+		+(\Obstacle,-\Obstacle/2);
 
 	\draw (O) -- (A1);
 	\draw (O) -- (A2);
@@ -216,7 +250,7 @@ y $\theta_2$, para luego estimar $\theta_{sonar}$.
 		\path[clip] (A1) -- (O) -- (A2) -- cycle;
 		%\draw [red, fill=red!20] (O) circle (1.5);
 		\draw [dotted] (O) circle (\SonarS/3);
-		\node[right] at ($(O) +(\SonarS/3, 0)$) {$\theta_{sonar}$};
+		\node[right] at ($(O) +(\SonarS/3, 0)$) {$\theta_{s}$};
 
 		\draw [dotted] (O) circle (\SonarS/5);
 		\node[right] at ($(O) +(\RobotThetaSonar/4:\SonarS/5)$) {$\theta_1$};
@@ -224,11 +258,12 @@ y $\theta_2$, para luego estimar $\theta_{sonar}$.
 	\end{scope}
 
 \end{tikzpicture}
-\captionof{figure}{Sensor de ultrasonido.\label{fig:sonar}}
-\end{center}
+\caption{Experimento para calcular el ángulo $\theta_s$ en el sensor de 
+ultrasonido.\label{fig:sonar}}
+\end{figure}
 
 
-Tras realizar las mediciones, se obtienen los siguientes resultados.
+Tras realizar las mediciones, se obtienen los siguientes resultados:
 \begin{center}
 \begin{tabular}{ | c | c | c | }
 \hline
@@ -253,42 +288,45 @@ $$ \overline{\theta_2} = 27,75 \quad s(\theta_2) = 1,0351 \quad s^2(\theta_2) =
 1.0714 $$
 De forma que se aproxima el valor a:
 $$ \theta_1 = 30 \pm 1º \quad \theta_2 = 28 \pm 1º $$
-$$\mu_{\theta_s} = \mu_{\theta_1} + \mu_{\theta_2} = 57,625 $$
-$$\sigma_{\theta_s} = \sqrt{\sigma_{\theta_1}^2 + \sigma_{\theta_2}^2} = 2,0261 
-$$
+%$$\mu_{\theta_s} = \mu_{\theta_1} + \mu_{\theta_2} = 57,625 $$
+%$$\sigma_{\theta_s} = \sqrt{\sigma_{\theta_1}^2 + \sigma_{\theta_2}^2} = 2,0261 $$
 Finalmente, aproximando $\theta_s$:
 $$\theta_s = 58 \pm 2º$$
 
+El fabricante indica un ángulo de apertura de 60º, centrado, con 30º hacia cada 
+lado. De forma que el resultado obtenido experimentalmente se acerca bastante al 
+resultado esperado.
 
-Se empleará la media de los valores de los ángulos, para reducir los errores que
-se pudieran producir en las medidas de los mismos, quedando $\theta_1 = 29.875
-º$ y $\theta_2 = 27.75 º$.
-
-Por lo tanto ya se puede obtener el ángulo de apertura:
-$$\theta_{sonar} = \theta_1 + \theta_2 = 57.625 º $$
+%Se empleará la media de los valores de los ángulos, para reducir los errores que
+%se pudieran producir en las medidas de los mismos, quedando $\theta_1 = 29.875
+%º$ y $\theta_2 = 27.75 º$.
+%
+%Por lo tanto ya se puede obtener el ángulo de apertura:
+%$$\theta_{s} = \theta_1 + \theta_2 = 57.625 º $$
 
 \subsubsection{Distancia medida}
 
 Para completar la calibración, es necesario poder calcular la distancia $s$,
 sabiendo el tiempo $t$. Para ello, se realizará otro experimento, midiendo las
 distancias de forma manual $s_r$ con una regla, y comparándolas con el valor
-teórico $s_t$, calculado con la ecuación~\ref{eq:velocidad-sonido}.
+teórico $s_t$, calculado con la ecuación~\ref{eq:velocidad-tiempo}.
 
-\begin{center}
+\begin{table}[h]
+\centering
 \begin{tabular}{ | c | c | c | }
 \hline
-$s_{r}$ & $s_{t}$ & $t$ \\ \hline
-m & m & \si{\micro\second} \\ \hline \hline
-0.20 & 0.138 &  805 \\ \hline
-0.30 & 0.210 & 1225 \\ \hline
-0.40 & 0.281 & 1638 \\ \hline
-0.50 & 0.353 & 2060 \\ \hline
-0.60 & 0.429 & 2500 \\ \hline
-0.80 & 0.568 & 3305 \\ \hline
-1.00 & 0.713 & 4155 \\ \hline
-1.20 & 0.859 & 5000 \\ \hline
+$s_{r}$(m) & $s_{t}$(m) & $t$(\si{\micro\second}) \\ \hline
+$\pm 0,05$ &  & $\pm 20$ \\ \hline \hline
+0,20 & 0,138 &  805 \\ \hline
+0,30 & 0,210 & 1225 \\ \hline
+0,40 & 0,281 & 1638 \\ \hline
+0,50 & 0,353 & 2060 \\ \hline
+0,60 & 0,429 & 2500 \\ \hline
+0,80 & 0,568 & 3305 \\ \hline
+1,00 & 0,713 & 4155 \\ \hline
+1,20 & 0,859 & 5000 \\ \hline
 \end{tabular}
-\end{center}
+\end{table}
 
 Se observa que el valor teórico $s_t$, no coincide con el valor real medido 
 $s_r$.
@@ -309,17 +347,21 @@ $$s = 238.64t + 7.8846\cdot10^{-3}$$
 (azul). La recta punteada es el valor teórico.\label{fig:sonar_plot}}
 \end{center}
 
-Después de repasar el programa que muestra el tiempo en Arduino, resulta que la 
-función \texttt{pulseIn} calcula el tiempo que ha pasado, empleando un bucle, y 
-luego multiplica las vueltas del bucle por el número de instrucciones. Sin 
-embargo, el compilador \texttt{avr-gcc} puede alterar este número cuando se 
-aplican optimizaciones. Este problema, provoca que el tiempo se vea alterado de 
-la forma $ t_{real} = t * K $. Siendo $ K = 1.3898 $, hallado de forma 
-experimental.
+Después de repasar el programa que muestra el tiempo que tarda el pulso de 
+ultrasonidos en regresar, se ha detectado un error, provocado en una función de 
+las bibliotecas de Arduino.
+
+Resulta que la función \texttt{pulseIn} calcula el tiempo que dura un pulso, 
+empleando un bucle, en el que se incrementa un contador. Luego multiplica las 
+vueltas del bucle por el número de instrucciones que de antemano se han 
+calculado. Sin embargo, el compilador \texttt{avr-gcc} puede alterar el número 
+de instrucciones cuando se aplican optimizaciones. Este problema, provoca que el 
+tiempo se vea alterado de la forma $ t_{real} = t * K $. Siendo $ K = 
+1.3898 $, hallado de forma experimental.
 
 Tras programar una nueva biblioteca para emplear el sensor de ultrasonidos, de 
-forma independiente a las optimizaciones del código, y empleando las 
-interrupciones, se vuelven a realizar las medidas.
+forma independiente a las optimizaciones del código (empleando interrupciones), 
+se vuelven a realizar las medidas.
 
 %Para calcular el tiempo se realizan 100000 mediciones y se halla la media.
 
@@ -347,69 +389,72 @@ Y por tanto, la recta característica es:
 $$ s = 170.84 t + 1.0857\cdot 10^{-2} = 341.68\frac{t}{2} + 1.0857\cdot 10^{-2}
 $$
 
-Si la comparamos con la ecuación~\ref{eq:velocidad-sonido}, se puede observar 
-que es muy similar a lo esperado.
+Existe un error fijo de aproximadamente un centímetro (1.0857cm), que puede 
+deberse a la dificultad de centrar la regla en el centro del sensor de 
+ultrasonidos. Sin embargo, para determinar la distancia de un objeto al robot, 
+esta distancia es despreciable.
+
+Si comparamos la ecuación~\ref{eq:velocidad-sonido}, con el resultado 
+experimental, despreciando el desplazamiento de 1cm, se puede observar que son 
+muy similares.
 
 La velocidad del sonido calculada de forma experimental, resulta ser 341,68 m/s.  
 Este valor puede oscilar, ya que depende de la temperatura. Para calcular la 
 temperatura:
 $$ T = \frac{v_{s}-331.3}{0.606} = 17.129 \si{\celsius} $$
-Dado que el experimento se ha realizado por la noche, esa temperatura se 
-encuentra dentro de un margen adecuado. La temperatura medida por un termómetro 
-en la habitación es de 18 ºC. Por lo que se puede afirmar que el experimento 
-muestra unos resultados esperados.
+La temperatura registrada de la sala es de 18º. Por lo que se puede afirmar que 
+el experimento muestra unos resultados esperados.
 
-Existe un error fijo de aproximadamente un centímetro, que se debe a la 
-dificultad de centrar la regla en el centro del sensor de ultrasonidos. Sin 
-embargo, para determinar la distancia de un objeto al robot, esta distancia es 
-despreciable.
+El error medio de distancia cometido, en el peor caso (a 1.20m de distancia 
+real) es de unos 4mm.
 
 Es importante mencionar, que un ajuste del error, empleando un método de 
-regresión, permite esconder errores como el que ha sido detectado y corregido.  
-Por ello, se ha decidido emplear los cálculos teóricos, y si no concuerdan con 
-los esperados, averiguar que ha causado el error.
+regresión, permite solventar errores como el que ha sido detectado, pero no los 
+corrige. Por ello, se ha decidido que si los cálculos teóricos, no concuerdan 
+con los esperados, averiguar que ha causado el error.
 
 \subsection{LDR}
 
-El sensor LDR permite obtener una medida de la cantidad de luz que incide sobre
-el mismo. El robot dispone de dos sensores LDR. Uno ambiental, está colocado en
-la parte superior, orientado hacia arriba. Además está cubierto por un cilindro
-cerrado de 4cm de plástico blanco. Esto le permite obtener una medida de la luz
-ambiente sin importar la dirección de donde proviene.
+El sensor LDR permite obtener una medida de la cantidad de luz que incide sobre 
+el mismo. El robot dispone de dos sensores LDR. Uno ambiental, que está colocado 
+en la parte superior, orientado hacia arriba. Además está cubierto por un 
+cilindro cerrado de 4cm de altura, de plástico blanco translúcido. Esto le 
+permite obtener una medida de la luz ambiente sin importar la dirección de donde 
+proviene.
 
 El sensor LDR direccional, se encuentra en la parte delantera orientado al 
-frente. Este sin embargo, está encapsulado en un cilindro abierto, de caucho 
-negro mate. Lo cual le permite observar de forma direccional la luz que recibe 
+frente. Este sin embargo, está encapsulado en un cilindro abierto, de plástico 
+negro opaco. Lo cual le permite observar de forma direccional la luz que recibe 
 por el frente, con el objetivo de encontrar una luz.
 
-\subsubsection{LDR ambiental}
+\subsubsection{\texttt{ldr0}: LDR ambiental}
 
-%Para calibrar el sensor ambiental, se realizarán algunas medidas comparando la 
-%distancia a un foco de luz, y la invarianza de la orientación.
-%
-%964
-%
-%El valor medido por el sensor, está representado en un intervalo $[0, 1024)$ de 
-%valores discretos. El valor 0, corresponde con un voltaje de 0V en la entrada de 
-%Arduino, y 1023 con +5V.
-%$$ V_0 = 5 \cdot \frac{l_0}{1023} $$
-%En la figura~\ref{fig:ldr_circuito} se observa el montaje del LDR $R_2$, junto 
-%con otra resistencia $R_1$ de un valor fijo de $10\si{\kohm}$.
-%
-%\begin{center}
-%\begin{tikzpicture}
-%	\draw
-%		(0,0) to ++(0,-1) node[ground] {}
-%		(0,0) to[R, l_=$R_1$, -*] ++(2,0)
-%		to[short, -o] ++(0,-1) node[below] {$V_0$}
-%
-%		(2,0) to[phR, l_=$R_2$] ++(2,0)
-%		to[short, -o] ++(0, -1) node[below] {V}
-%	;
-%\end{tikzpicture}
-%\captionof{figure}{Circuito del sensor LDR.\label{fig:ldr_circuito}}
-%\end{center}
-%
+Para calibrar el sensor ambiental, se realizarán algunas medidas comparando la 
+distancia a un foco de luz. También se compararán los valores con distintos 
+ángulos, para observar si realmente es invariante a la orientación.
+
+El valor medido por el sensor, está representado en un intervalo $[0, 1024)$ de 
+valores discretos. El valor 0, corresponde con un voltaje de 0V en la entrada de 
+Arduino, y 1023 con +5V. De forma que si $l_0$ es el valor discreto medido por 
+Arduino:
+$$ V_0 = 5 \cdot \frac{l_0}{1023} $$
+En la figura~\ref{fig:ldr_circuito} se observa el montaje del LDR $R_2$, junto 
+con otra resistencia $R_1$ de un valor fijo de $10\si{\kohm}$.
+
+\begin{center}
+\begin{tikzpicture}
+	\draw
+		(0,0) to ++(0,-1) node[ground] {}
+		(0,0) to[R, l_=$R_1$, -*] ++(2,0)
+		to[short, -o] ++(0,-1) node[below] {$V_0$}
+
+		(2,0) to[phR, l_=$R_2$] ++(2,0)
+		to[short, -o] ++(0, -1) node[below] {V}
+	;
+\end{tikzpicture}
+\captionof{figure}{Circuito del sensor LDR.\label{fig:ldr_circuito}}
+\end{center}
+
 %Para calcular el voltaje en $V_0$:
 %$$ I = \frac{V}{R_T} = \frac{V}{R_1 + R_2} $$
 %$$ V_{0} = I \cdot R_1 = V \frac{R_1}{R_1+R_2} = \frac{V}{1+\frac{R_2}{R_1}}$$
@@ -425,7 +470,7 @@ por el frente, con el objetivo de encontrar una luz.
 %\left(\frac{R_2}{R_1} \right)^{-\gamma} = \left(\frac{D_2}{D_1}\right)^2$$
 %$$ \gamma = \frac{2 \ln \frac{D_2}{D_1} }{-\ln\frac{R_2}{R_1}} $$
 %
-%% TODO: Comprobar estas ecuaciones por algún libro.
+% TODO: Comprobar estas ecuaciones por algún libro.
 
 
 Para calibrar el sensor ambiental, se realizarán algunas medidas observando el 
@@ -435,10 +480,13 @@ así como el ángulo.
 En cada medida, el sensor realiza 5000 mediciones de forma contínua, y luego 
 envía el valor de la media aritmética al ordenador, que es registrado.
 
+En la tabla, $s$ indica la distancia a la fuente de luz. Los ángulos indican la 
+orientación del robot:
+
 \begin{center}
 \begin{tabular}{ | c | c | c | c | c | }
 \hline
-$t$ & $0º$ & $-90º$ & $+90º$ & $+180º$ \\ \hline
+$s$(m) & $0º$ & $-90º$ & $+90º$ & $+180º$ \\ \hline
 0.20 & 936 & 926 & 933 & 943 \\ \hline
 0.40 & 823 & 784 & 831 & 843 \\ \hline
 0.60 & 719 & 675 & 729 & 742 \\ \hline
@@ -451,31 +499,96 @@ $t$ & $0º$ & $-90º$ & $+90º$ & $+180º$ \\ \hline
 \end{tabular}
 \end{center}
 
-\begin{center}
-\begin{tabular}{ *{8}{|c} | }
-\hline
-$s_{r}$ & 0.20 & 0.30 & 0.40 & 0.60 & 0.80 & 1.00 & 1.20 \\ \hline
-ldr & 500 & 394 & 330 & 255 & 202 & 160 & 140 \\ \hline
-\end{tabular}
-\end{center}
+En la siguiente figura, se puede observar en una escala logarítmica para el eje 
+y, el valor del sensor para cada orientación.
+
+\begin{tikzpicture}
+\begin{semilogyaxis}[grid=both,
+	width=\columnwidth,
+	height=0.4\textheight,
+	xlabel = {Distancia a la luz (m)} ,
+	ylabel = {Valor del sensor},
+	xmin = 0.2, xmax = 1.8,
+	ymin = 250, ymax = 1024,
+	legend entries={$0º$,$-90º$,$90º$,$180º$},
+	legend columns=4,
+	legend style={
+		at={(0.5,1.1)},
+		anchor=north}
+]
+	\addplot+[smooth] table[x=x, y=0] {ldr0.csv};
+	\addplot+[smooth] table[x=x, y=-90] {ldr0.csv};
+	\addplot+[smooth] table[x=x, y=90] {ldr0.csv};
+	\addplot+[smooth] table[x=x, y=180] {ldr0.csv};
+\end{semilogyaxis}
+\end{tikzpicture}
+
+Existe una variación bastante marcada en la orientación de $-90º$. Esta 
+variación indica que el sensor recibe menos luz de la esperada. Dicha variación 
+está relacionada con la superficie del robot. Dado que hay cables en la 
+superficie, cuando se coloca a $-90º$, los cables se sitúan entre la luz y el 
+sensor, y provocan una disminución de la intensidad.
+
+En las demás orientaciones no se producen grandes cambios. Por lo que se asume 
+que el sensor es realmente independiente de la orientación.
+
+\subsubsection{\texttt{ldr1}: LDR direccional}
+El sensor LDR direccional, por el contrario, trata de aumentar la variación de 
+la luz conforme a la orientación. Para calibrar este sensor se realizará un 
+experimento similar, dividido en 4 orientaciones. Se asume que los valores para 
+los ángulos opuestos, dada la simetría, son iguales.
+
+Se muestran en la siguiente tabla los resultados obtenidos:
 
 \begin{center}
 \begin{tabular}{ | c | c | c | c | c | }
 \hline
-$t$ & $0º$ & $30º$ & $60º$ & $90º$ \\ \hline
-0.20 & 1014 & 1008 & 829 & 620 \\ \hline
-0.40 & 1008 & 898 & 718 & 455 \\ \hline
-0.60 & 999 & 559 &  & 434 \\ \hline
-0.80 & 993 & 536 &  & 374 \\ \hline
-1.00 & 998 & 497 &  & 177 \\ \hline
-1.20 & 979 & 473 &  & 123 \\ \hline
-1.40 & 959 & 370 &  &  \\ \hline
-1.60 & 954 &  &  &  \\ \hline
-1.80 & 938 &  &  &  \\ \hline
+$s$(m) & $0º$ & $30º$ & $60º$ & $90º$ \\ \hline
+0.10 & 1015 & 1011 & 1004 & 977 \\ \hline
+0.20 & 1015 & 998 & 670 & 404 \\ \hline
+0.30 & 1013 & 915 & 520 & 414 \\ \hline
+0.40 & 1011 & 838 & 416 & 314 \\ \hline
+0.50 & 1008 & 684 & 308 & 254 \\ \hline
+0.60 & 1004 & 534 & 216 & 202 \\ \hline
+0.70 & 999 & 500 & 214 & 113 \\ \hline
+0.80 & 996 & 394 & 188 & 95 \\ \hline
+0.90 & 992 & 355 & 164 & 80 \\ \hline
+1.00 & 987 & 352 & 136 & 70 \\ \hline
+1.20 & 977 & 277 & 96 & 60 \\ \hline
+1.40 & 968 & 173 & 65 & 57 \\ \hline
 \end{tabular}
 \end{center}
 
-\subsection{Ratón}
+Finalmente, en la figura~\ref{fig:ldr1}, se muestran también en una escala 
+logarítmica para el valor del sensor.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+\begin{semilogyaxis}[grid=both,
+	width=\columnwidth,
+	height=0.4\textheight,
+	xlabel = {Distancia a la luz (m)} ,
+	ylabel = {Valor del sensor},
+	xmin = 0, xmax = 1.4,
+	ymin = 0, ymax = 1100,
+	legend entries={0º,30º,60º,90º},
+	legend columns=4,
+	legend style={
+		at={(0.5,1.1)},
+		anchor=north}
+]
+	\addplot+[smooth] table[x=x, y=0] {ldr1.csv};
+	\addplot+[smooth] table[x=x, y=30] {ldr1.csv};
+	\addplot+[smooth] table[x=x, y=60] {ldr1.csv};
+	\addplot+[smooth] table[x=x, y=90] {ldr1.csv};
+\end{semilogyaxis}
+\end{tikzpicture}
+\caption{Resultados del experimento de calibración de 
+\texttt{ldr1}.\label{fig:ldr1}}
+\end{figure}
+
+\subsection{\texttt{mouse0}: Ratón de bola}
 
 En la parte posterior, un ratón de bola permite obtener mediciones del movimiento del
 robot. Tiene un controlador EM83702BP, que dispone con dos contadores digitales que
@@ -483,14 +596,14 @@ realizan la medición del desplazamiento en el eje $x$ e $y$.
 
 Una bola de goma se encuentra en contacto con el suelo. Al desplazar el ratón, 
 la bola gira alrededor de un eje imaginario, que es perpendicular al sentido del
-desplazamiento y paralelo al suelo.
+desplazamiento y paralelo al suelo. Desplazándose en la dirección de $\vec{m}$.
 
 Ya que los movimientos efectuados por el robot serán los que provoquen sus dos ruedas,
 se puede determinar la posición, midiendo sólo el desplazamiento del ratón. Para ello,
 se observa en la figura~\ref{fig:giro} un ejemplo de un giro de $\alpha = \RobotAngleº$.
 
 \begin{center}
-\begin{tikzpicture}[>=latex]
+\begin{tikzpicture}[>=latex,semithick]
 	%\path[draw] (-4,0)  coordinate [label= left:$A$] (A)
 	%        -- ( 0,4)  coordinate [label=above:$C$] (C)
 %        -- ( 4,0)  coordinate [label=right:$B$] (B)
@@ -537,11 +650,11 @@ se observa en la figura~\ref{fig:giro} un ejemplo de un giro de $\alpha = \Robot
 		node[pos=0.5,auto=left]{$\gamma$};
 
 	% Dibujar el robot en A1
-	\draw[dotted] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
+	\draw[] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
 	\draw[dotted] (C1) circle(\RobotBall);
 
 	%Dibujar el robot en A2
-	\draw[dotted,rotate=\RobotAngle] (A2) +(-\RobotSize/2,0)
+	\draw[rotate=\RobotAngle] (A2) +(-\RobotSize/2,0)
 		rectangle +(\RobotSize/2,-\RobotSize);
 	\draw[dotted] (C2) circle(\RobotBall);
 
@@ -563,7 +676,10 @@ se observa en la figura~\ref{fig:giro} un ejemplo de un giro de $\alpha = \Robot
 \captionof{figure}{Diagrama de un giro del robot.\label{fig:giro}}
 \end{center}
 
-El vector $ \vec{r} $ indica el movimiento que realizó el robot en línea recta.
+El vector $\vec{r}$ indica el movimiento que realizó el robot. Parte del punto 
+$A_1$, y gira de forma circular, con centro en $O$, hasta $A_2$, con un ángulo 
+$\alpha$.
+
 Conociendo el ángulo $\gamma$:
 $$ R' = \overline{OA_1} \quad R = \overline{OC_1} $$
 $$
@@ -582,20 +698,26 @@ r_y = \begin{cases}
 $$
 \subsubsection{Movimiento de la bola}
 Para poder analizar el movimiento que realizará el robot, mediante la 
-información que este proporciona, es necesario conocer como varía el vector 
-$\vec{m}$ con respecto a la información proporcionada por los optocodificadores.
+información que el ratón proporciona, es necesario conocer como varía el vector 
+$\vec{m}$ que indica el desplazamiento real del ratón, con respecto a la 
+información proporcionada por el mismo.
 
-De modo que se analiza a continuación, como el movimiento de la bola, roza en 
-los puntos $Bx$ y $By$ con los rodillos del ratón. En la figura~\ref{fig:bola} 
-se observa con detalle el mismo giro que en la figura~\ref{fig:giro}.
+Para ello, es necesario averiguar el funcionamiento del ratón. Este consta de 
+una bola de goma, que está situada en un zócalo, donde puede girar libremente, 
+al mover el ratón por una superficie.
+
+Dos rodillos de plástico rozan con la bola, situados en un ángulo de $90º$. A 
+continuación se analiza, como el movimiento de la bola, roza en los puntos $Bx$ 
+y $By$ con los rodillos del ratón. En la figura~\ref{fig:bola} se observa con 
+detalle el mismo giro que en la figura~\ref{fig:giro}.
 
 % TODO: Poner los ejes en la figura y R
 
 \begin{center}
-\begin{tikzpicture}[>=latex]
+\begin{tikzpicture}[>=latex, semithick]
 	\pgfmathsetmacro{\BallRadius}{3.0}%
 	\pgfmathsetmacro{\BallOptoL}{2}%
-	\pgfmathsetmacro{\BallOptoD}{0.5}%
+	\pgfmathsetmacro{\BallOptoD}{0.6}%
 	\pgfmathsetmacro{\BallBeta}{atan(\RobotSize/\RobotRadius)}%
 	\pgfmathsetmacro{\BallBetaDouble}{90.0-\BallBeta*2.0}%
 
@@ -607,9 +729,12 @@ se observa con detalle el mismo giro que en la figura~\ref{fig:giro}.
 	%Ejes
 	\draw[dotted] (-\BallRadius,0) -- (\BallRadius,0);
 	\draw[dotted] (0,\BallRadius) -- (0,-\BallRadius);
+
+	%Radio de la bola
+	\draw[] (O) -- +(-\BallRadius,0) node[pos=0.5,auto=left]{$R_b$};
 	%Cilindros de los ejes
-	\draw[dotted] (By) +(-\BallOptoD,-\BallOptoL) rectangle +(0,\BallOptoL);
-	\draw[dotted] (Bx) +(-\BallOptoL,-\BallOptoD) rectangle +(\BallOptoL,0);
+	\draw[] (By) +(-\BallOptoD,-\BallOptoL) rectangle +(0,\BallOptoL);
+	\draw[] (Bx) +(-\BallOptoL,-\BallOptoD) rectangle +(\BallOptoL,0);
 	%Puntos
 	\fill[black] (180-\BallBeta*2:\BallRadius) coordinate [label=above:$C_y$] (Cy) circle (1pt);
 	\draw[blue] (By) -- (Cy) node[pos=0.5,auto=right]{$d_y$};
@@ -665,22 +790,24 @@ invertidos.\label{fig:bola}}
 
 \subsubsection{El tamaño de la bola}
 
-A continuación, trataré de averiguar cómo se mueven los rodillos del ratón, 
-cuando la bola gira. Para ello moveré el ratón un desplazamiento $\vec{m}$ a una 
-velocidad uniforme y en línea recta.
+¿Cómo se mueven los rodillos del ratón, cuando la bola gira? Para responder a 
+esta cuestión, se moverá el ratón un desplazamiento $\vec{m}$ a una velocidad 
+uniforme y en línea recta, y se intentará calcular de forma teórica el resultado 
+esperado.
 
 Los ejes están intercambiados con respecto al orden habitual de un plano. Esto 
-es debido a que el ratón está colocado en el robot como en la figura. Sin 
-embargo mantienen el sentido. Hacia arriba y derecha son positivos.
+es debido a que el ratón está colocado en el robot como en la 
+figura~\ref{fig:bola}. Sin embargo mantienen el sentido. Hacia arriba y derecha 
+son positivos.
 
 El rodillo inferior, girará rozando continuamente por el punto $B_x$ a medida 
 que la bola gire. Dado que la dirección $\vec{m}$ permanece constante durante 
 este movimiento, el punto $B_x$ describirá una trayectoria circular en la 
 superficie de la bola. La bola tiene un radio $R_b$.
 
-Llamo $p_x$ al perímetro de esta circunferencia, que es tangente a $B_x$ y $C_x$ 
-y que tiene por diámetro $d_x$. De modo que cuando la bola dé una vuelta 
-completa, el rodillo habrá avanzado exactamente $p_x$.
+El perímetro de esta circunferencia se denomina por $p_x$, que es tangente a 
+$B_x$ y $C_x$ y que tiene por diámetro $d_x$. De modo que cuando la bola dé una 
+vuelta completa, el rodillo habrá avanzado exactamente $p_x$.
 
 La distancia $d_x$ es la cuerda de ángulo $\gamma$, cuya longitud es, por su 
 propia definición:
@@ -696,8 +823,8 @@ Finalmente, para los perímetros:
 $$ p_x = \frac{2\pi d_x}{2} = 2 \pi R_b\cos \beta \quad  p_y = \frac{2\pi 
 d_y}{2} = 2 \pi R_b\sin \beta $$
 
-Si suponemos que no hay ningún deslizamiento entre la bola y el rodillo, cuando 
-la bola avance $\vec{m}$, girará un ángulo $\theta_b$:
+Si se supone que no hay ningún deslizamiento entre la bola y el rodillo, cuando 
+la bola avance $\vec{m}$, ésta girará un ángulo $\theta_b$:
 $$ \theta_b = \frac{m}{R_b} $$
 
 Si $R_r$ es el radio de los rodillos, estos girarán un ángulo:
@@ -709,9 +836,13 @@ $$ \theta_x = \frac{\theta_b 2R_b\cos \beta}{2R_r} =
 $$ \theta_y = \frac{\theta_b 2R_b\sin \beta}{2R_r} =
 	\frac{R_b}{R_r}\theta_b\sin \beta$$
 Recuperando el valor de $\theta_b$, el radio $R_b$ dasaparece:
-$$ \theta_x = \frac{m \cos \beta}{R_r} \quad
-\theta_y = \frac{m \sin \beta}{R_r} $$
-Es decir, que el tamaño no importa, de la bola.
+\begin{equation}
+\theta_x = \frac{m \cos \beta}{R_r} \quad
+\theta_y = \frac{m \sin \beta}{R_r} \label{eq:bola-angulo}
+\end{equation}
+De modo que se obtiene una relación entre el ángulo con el que se desplaza el 
+ratón y el giro de cada uno de los rodillos, como se deseaba. Además se observa 
+que el tamaño no importa, de la bola, para calcular el giro de los rodillos.
 
 \subsubsection{Los optoreceptores}
 
@@ -721,17 +852,45 @@ Este efecto, provoca que un sensor registre el número de veces que se ha cortad
 el haz, y por lo tanto mide, de forma discreta, cuánto ha girado el rodillo, es 
 decir $\theta_x$ y $\theta_y$.
 
-Cada disco tiene 27 dientes y $R_r$ mide 1.35$\pm$0.1 mm.
+%TODO:Incluir diagrama de los dientes y las gráficas
 
-$o_x$ y $o_y$ son los valores medidos por los contadores que acumulan el número 
-de veces que se ha cortado el haz, y por lo tanto el número de dientes que se ha 
-desplazado el rodillo.
+Cada disco tiene 27 dientes y $R_r$, el radio de los rodillos, es de 
+1.4$\pm$0.1 mm.
 
-$$o_x = \frac{27 \theta_x}{2\pi} \quad o_y = \frac{27 \theta_y}{2\pi}$$
+Además, en cada disco se encuentran dos receptores, desfasados 90º, de forma que 
+pueden detectar el sentido de giro. Por cada diente que se avanza, se cuentan 4 
+pasos en los contadores digitales.
 
-Sustituyendo el valor del ángulo $\theta_x$ y $\theta_y$:
-$$ o_x = \frac{27}{2 \pi R_r} m \cos \beta \quad
-	o_y = \frac{27}{2 \pi R_r} m \sin \beta $$
+Si $o_x$ y $o_y$ son los valores medidos por los contadores que acumulan el 
+número de pasos que se ha desplazado el rodillo:
+$$o_x = \frac{27 \cdot 4 \theta_x}{2\pi} \quad 
+o_y = \frac{27 \cdot 4 \theta_y}{2\pi}$$
+
+Sustituyendo el valor del ángulo $\theta_x$ y $\theta_y$ por la 
+ecuación~\ref{eq:bola-angulo}:
+$$ o_x = \frac{27\cdot4}{2 \pi R_r} m \cos \beta \quad
+	o_y = \frac{27\cdot4}{2 \pi R_r} m \sin \beta $$
+
+Añadiendo una constante $K_r$:
+$$K_r = \frac{27\cdot4}{2 \pi R_r} = 12\pm2$$
+$$ o_x = K_r m \cos \beta \quad
+	o_y = K_r m \sin \beta $$
+Esta constante, $K_r$, ha sido calculada de forma experimental, con un valor de 
+11,484. Este valor se encuentra dentro del margen calculado, por lo que se 
+considera como válido, y verifica los cálculos realizados.
+$$K_r = 11,484$$
+Para calcular esta constante, se realizó un movimiento de 150mm, en línea recta 
+y se registraron los valores de $o_x$, que mide el desplazamiento en el eje $y$:
+
+\begin{center}
+\begin{tabular}{ | c | c | c | c | c | c |}
+\hline
+$o_x$ & 1719 & 1728 & 1722 & 1719 & 1725 \\ \hline
+\end{tabular}
+\end{center}
+
+Tras calcular la media, y dividirla por 150mm, se obtiene el valor $K_r$.
+
 
 
 \section{Posibles errores}
@@ -750,6 +909,14 @@ sustituirla por alguna función no bloqueante que emplee interrupciones.
 
 %\vfill
 
+\section{TODO}
+Este documento está incompleto. Faltan cálculos en la parte de la odometría, así 
+como los experimentos que verifican la posición de robot.
 
-\end{multicols}
+Falta cambiar los gráficos a pgf. Corregir la ortografía. Usar la precisión en 
+los experimentos. Encontrar la ecuación que describe la luz con la distancia, en 
+el LDR. Y las ecuaciones que describen el movimiento de los motores, sabiendo el 
+voltaje y tiempo de funcionamiento.
+
+%\end{multicols}
 \end{document}
