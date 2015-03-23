@@ -13,7 +13,7 @@ int ldr0, ldr1;
 double ldr0m = 0, ldr1m = 0;
 unsigned long i = 0;
 
-#define N 1000
+#define N 5000
 
 void loop()
 {
@@ -36,7 +36,5 @@ void loop()
 		Serial.print("\n");
 		ldr0m=0;
 		ldr1m=0;
-		
 	}
-	
 }
