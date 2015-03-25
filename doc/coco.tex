@@ -86,8 +86,6 @@
 		name intersections={of=bissectrice and circle, by={middleArc}}
 		] (#3) -- (middleArc) node[pos=1.3] {#5};
 }
-
-
 \begin{document}
 
 %\maketitle
@@ -106,7 +104,6 @@ rodrigo.arias@udc.es
 \newcommand\RobotThetaSonar{60.0}
 
 %\begin{multicols}{2}
-
 \section{Descripción}
 Coco es un robot diseñado para aprender los principios básicos de la robótica.
 Ha sido creado con la intención de reutilizar componentes de antiguos aparatos y 
@@ -133,6 +130,7 @@ siguientes:
 %Para efectuar el movimiento, dispone de dos motores Mabuchi RF-500TB-12560, 
 %colocados a ambos lados.
 %TODO: Completar descripción
+
 
 \section{Calibración de sensores}
 \subsection{\texttt{sonar0}: Ultrasonidos HC-SR04}
@@ -179,7 +177,6 @@ En el caso de que el robot se mueva con una velocidad $\vec{v}$, si esta
 velocidad es pequeña comparada con la del sonido, se puede despreciar. Una 
 velocidad de 1m/s, provocaría una diferencia en la distancia estimada de un 
 objeto a 3m, de aproximadamente 9mm.
-
 \subsubsection{Ángulo de apertura $\theta_{s}$}
 Para calibrar el sensor, es necesario determinar el ángulo de apertura 
 $\theta_{s}$, que indica hasta que punto el sensor puede recibir el eco del 
@@ -303,7 +300,6 @@ resultado esperado.
 %
 %Por lo tanto ya se puede obtener el ángulo de apertura:
 %$$\theta_{s} = \theta_1 + \theta_2 = 57.625 º $$
-
 \subsubsection{Distancia medida}
 
 Para completar la calibración, es necesario poder calcular la distancia $s$,
@@ -412,7 +408,6 @@ Es importante mencionar, que un ajuste del error, empleando un método de
 regresión, permite solventar errores como el que ha sido detectado, pero no los 
 corrige. Por ello, se ha decidido que si los cálculos teóricos, no concuerdan 
 con los esperados, averiguar que ha causado el error.
-
 \subsection{LDR}
 
 El sensor LDR permite obtener una medida de la cantidad de luz que incide sobre 
@@ -426,7 +421,6 @@ El sensor LDR direccional, se encuentra en la parte delantera orientado al
 frente. Este sin embargo, está encapsulado en un cilindro abierto, de plástico 
 negro opaco. Lo cual le permite observar de forma direccional la luz que recibe 
 por el frente, con el objetivo de encontrar una luz.
-
 \subsubsection{\texttt{ldr0}: LDR ambiental}
 
 Para calibrar el sensor ambiental, se realizarán algunas medidas comparando la 
@@ -531,7 +525,6 @@ sensor, y provocan una disminución de la intensidad.
 
 En las demás orientaciones no se producen grandes cambios. Por lo que se asume 
 que el sensor es realmente independiente de la orientación.
-
 \subsubsection{\texttt{ldr1}: LDR direccional}
 El sensor LDR direccional, por el contrario, trata de aumentar la variación de 
 la luz conforme a la orientación. Para calibrar este sensor se realizará un 
@@ -587,7 +580,6 @@ logarítmica para el valor del sensor.
 \caption{Resultados del experimento de calibración de 
 \texttt{ldr1}.\label{fig:ldr1}}
 \end{figure}
-
 \subsection{\texttt{mouse0}: Ratón de bola}
 
 En la parte posterior, un ratón de bola permite obtener mediciones del movimiento del
@@ -707,8 +699,8 @@ una bola de goma, que está situada en un zócalo, donde puede girar libremente,
 al mover el ratón por una superficie.
 
 Dos rodillos de plástico rozan con la bola, situados en un ángulo de $90º$. A 
-continuación se analiza, como el movimiento de la bola, roza en los puntos $Bx$ 
-y $By$ con los rodillos del ratón. En la figura~\ref{fig:bola} se observa con 
+continuación se analiza, como el movimiento de la bola, roza en los puntos $B_1$ 
+y $B_2$ con los rodillos del ratón. En la figura~\ref{fig:bola} se observa con 
 detalle el mismo giro que en la figura~\ref{fig:giro}.
 
 % TODO: Poner los ejes en la figura y R
@@ -724,8 +716,8 @@ detalle el mismo giro que en la figura~\ref{fig:giro}.
 	\draw circle(\BallRadius);
 	\fill [black] (0,0) coordinate [label=below:$O$] (O) circle (1pt);
 	%Puntos de choque
-	\fill [black] (0,-\BallRadius) coordinate [label=below:$B_x$] (Bx) circle (1pt);
-	\fill [black] (-\BallRadius,0) coordinate [label=left:$B_y$] (By) circle (1pt);
+	\fill [black] (0,-\BallRadius) coordinate [label=below:$B_1$] (Bx) circle (1pt);
+	\fill [black] (-\BallRadius,0) coordinate [label=left:$B_2$] (By) circle (1pt);
 	%Ejes
 	\draw[dotted] (-\BallRadius,0) -- (\BallRadius,0);
 	\draw[dotted] (0,\BallRadius) -- (0,-\BallRadius);
@@ -736,10 +728,10 @@ detalle el mismo giro que en la figura~\ref{fig:giro}.
 	\draw[] (By) +(-\BallOptoD,-\BallOptoL) rectangle +(0,\BallOptoL);
 	\draw[] (Bx) +(-\BallOptoL,-\BallOptoD) rectangle +(\BallOptoL,0);
 	%Puntos
-	\fill[black] (180-\BallBeta*2:\BallRadius) coordinate [label=above:$C_y$] (Cy) circle (1pt);
-	\draw[blue] (By) -- (Cy) node[pos=0.5,auto=right]{$d_y$};
-	\fill[black] (90-\BallBeta*2:\BallRadius) coordinate [label=right:$C_x$] (Cx) circle (1pt);
-	\draw[blue] (Bx) -- (Cx) node[pos=0.5,auto=right]{$d_x$};
+	\fill[black] (180-\BallBeta*2:\BallRadius) coordinate [label=above:$C_2$] (Cy) circle (1pt);
+	\draw[blue] (By) -- (Cy) node[pos=0.5,auto=right]{$d_2$};
+	\fill[black] (90-\BallBeta*2:\BallRadius) coordinate [label=right:$C_1$] (Cx) circle (1pt);
+	\draw[blue] (Bx) -- (Cx) node[pos=0.5,auto=right]{$d_1$};
 	%Ángulos
 	%\draw[dotted] (Bx) +(-90:\BallRadius/5) arc
 	%(-90:-90-\BallBeta:\BallRadius/5.0) node[pos=0,auto=left]{$\beta$};
@@ -784,10 +776,8 @@ detalle el mismo giro que en la figura~\ref{fig:giro}.
 
 
 \end{tikzpicture}
-\captionof{figure}{Diagrama de la bola del ratón. Los ejes están 
-invertidos.\label{fig:bola}}
+\captionof{figure}{Diagrama de la bola del ratón.\label{fig:bola}}
 \end{center}
-
 \subsubsection{El tamaño de la bola}
 
 ¿Cómo se mueven los rodillos del ratón, cuando la bola gira? Para responder a 
@@ -800,57 +790,56 @@ es debido a que el ratón está colocado en el robot como en la
 figura~\ref{fig:bola}. Sin embargo mantienen el sentido. Hacia arriba y derecha 
 son positivos.
 
-El rodillo inferior, girará rozando continuamente por el punto $B_x$ a medida 
+El rodillo inferior, girará rozando continuamente por el punto $B_1$ a medida 
 que la bola gire. Dado que la dirección $\vec{m}$ permanece constante durante 
-este movimiento, el punto $B_x$ describirá una trayectoria circular en la 
+este movimiento, el punto $B_1$ describirá una trayectoria circular en la 
 superficie de la bola. La bola tiene un radio $R_b$.
 
-El perímetro de esta circunferencia se denomina por $p_x$, que es tangente a 
-$B_x$ y $C_x$ y que tiene por diámetro $d_x$. De modo que cuando la bola dé una 
-vuelta completa, el rodillo habrá avanzado exactamente $p_x$.
+El perímetro de esta circunferencia se denomina por $p_1$, que es tangente a 
+$B_1$ y $C_1$ y que tiene por diámetro $d_1$. De modo que cuando la bola dé una 
+vuelta completa, el rodillo habrá avanzado exactamente $p_1$.
 
-La distancia $d_x$ es la cuerda de ángulo $\gamma$, cuya longitud es, por su 
+La distancia $d_1$ es la cuerda de ángulo $\gamma$, cuya longitud es, por su 
 propia definición:
-$$ d_x = R_b \, \text{crd} \, \gamma = 2R_b \sin \frac{\gamma}{2}$$
+$$ d_1 = R_b \, \text{crd} \, \gamma = 2R_b \sin \frac{\gamma}{2}$$
 Además, el ángulo $\gamma = 180º - 2\beta$, pues forma un triángulo isósceles:
-$$ d_x = 2R_b \sin(90-\beta) = 2R_b\cos \beta$$
-De igual modo para $d_y$:
-$$ d_y = R_b \, \text{crd} \, \theta = 2R_b \sin \frac{\theta}{2} $$
+$$ d_1 = 2R_b \sin(90-\beta) = 2R_b\cos \beta$$
+De igual modo para $d_2$:
+$$ d_2 = R_b \, \text{crd} \, \theta = 2R_b \sin \frac{\theta}{2} $$
 Sabiendo que $\theta = 180º - 2\delta$ y que $\beta = 90 - \delta$, puesto que 
-$d_x \parallel d_y$:
-$$ d_y = 2R_b \sin (90 - \delta) = 2R_b \sin \beta $$
+$d_1 \parallel d_2$:
+$$ d_2 = 2R_b \sin (90 - \delta) = 2R_b \sin \beta $$
 Finalmente, para los perímetros:
-$$ p_x = \frac{2\pi d_x}{2} = 2 \pi R_b\cos \beta \quad  p_y = \frac{2\pi 
-d_y}{2} = 2 \pi R_b\sin \beta $$
+$$ p_1 = \frac{2\pi d_1}{2} = 2 \pi R_b\cos \beta \quad  p_2 = \frac{2\pi 
+d_2}{2} = 2 \pi R_b\sin \beta $$
 
 Si se supone que no hay ningún deslizamiento entre la bola y el rodillo, cuando 
 la bola avance $\vec{m}$, ésta girará un ángulo $\theta_b$:
 $$ \theta_b = \frac{m}{R_b} $$
 
 Si $R_r$ es el radio de los rodillos, estos girarán un ángulo:
-$$ \theta_x = \frac{\theta_b d_x}{2R_r} \quad
-	\theta_y = \frac{\theta_b d_y}{2R_r}$$
-Sustituyendo $d_x$ y $d_y$:
-$$ \theta_x = \frac{\theta_b 2R_b\cos \beta}{2R_r} =
+$$ \theta_1 = \frac{\theta_b d_1}{2R_r} \quad
+	\theta_2 = \frac{\theta_b d_2}{2R_r}$$
+Sustituyendo $d_1$ y $d_2$:
+$$ \theta_1 = \frac{\theta_b 2R_b\cos \beta}{2R_r} =
 	\frac{R_b}{R_r}\theta_b\cos \beta$$
-$$ \theta_y = \frac{\theta_b 2R_b\sin \beta}{2R_r} =
+$$ \theta_2 = \frac{\theta_b 2R_b\sin \beta}{2R_r} =
 	\frac{R_b}{R_r}\theta_b\sin \beta$$
-Recuperando el valor de $\theta_b$, el radio $R_b$ dasaparece:
+Recuperando el valor de $\theta_b$, el radio $R_b$ desaparece:
 \begin{equation}
-\theta_x = \frac{m \cos \beta}{R_r} \quad
-\theta_y = \frac{m \sin \beta}{R_r} \label{eq:bola-angulo}
+\theta_1 = \frac{m \cos \beta}{R_r} \quad
+\theta_2 = \frac{m \sin \beta}{R_r} \label{eq:bola-angulo}
 \end{equation}
 De modo que se obtiene una relación entre el ángulo con el que se desplaza el 
 ratón y el giro de cada uno de los rodillos, como se deseaba. Además se observa 
 que el tamaño no importa, de la bola, para calcular el giro de los rodillos.
-
 \subsubsection{Los optoreceptores}
 
 Los rodillos que rozan con la bola, tienen en los extremos unos discos con
 ranuras equiespaciadas, de modo que cortan un haz de luz infrarrojo al girar.  
 Este efecto, provoca que un sensor registre el número de veces que se ha cortado 
 el haz, y por lo tanto mide, de forma discreta, cuánto ha girado el rodillo, es 
-decir $\theta_x$ y $\theta_y$.
+decir $\theta_1$ y $\theta_2$.
 
 %TODO:Incluir diagrama de los dientes y las gráficas
 
@@ -861,37 +850,95 @@ Además, en cada disco se encuentran dos receptores, desfasados 90º, de forma q
 pueden detectar el sentido de giro. Por cada diente que se avanza, se cuentan 4 
 pasos en los contadores digitales.
 
-Si $o_x$ y $o_y$ son los valores medidos por los contadores que acumulan el 
+Si $o_1$ y $o_2$ son los valores medidos por los contadores que acumulan el 
 número de pasos que se ha desplazado el rodillo:
-$$o_x = \frac{27 \cdot 4 \theta_x}{2\pi} \quad 
-o_y = \frac{27 \cdot 4 \theta_y}{2\pi}$$
+$$o_1 = \frac{27 \cdot 4 \theta_1}{2\pi} \quad 
+o_2 = \frac{27 \cdot 4 \theta_2}{2\pi}$$
 
-Sustituyendo el valor del ángulo $\theta_x$ y $\theta_y$ por la 
+Sustituyendo el valor del ángulo $\theta_1$ y $\theta_2$ por la 
 ecuación~\ref{eq:bola-angulo}:
-$$ o_x = \frac{27\cdot4}{2 \pi R_r} m \cos \beta \quad
-	o_y = \frac{27\cdot4}{2 \pi R_r} m \sin \beta $$
+$$ o_1 = \frac{27\cdot4}{2 \pi R_r} m \cos \beta \quad
+	o_2 = \frac{27\cdot4}{2 \pi R_r} m \sin \beta $$
 
 Añadiendo una constante $K_r$:
 $$K_r = \frac{27\cdot4}{2 \pi R_r} = 12\pm2$$
-$$ o_x = K_r m \cos \beta \quad
-	o_y = K_r m \sin \beta $$
+$$ o_1 = K_r m \cos \beta \quad
+	o_2 = K_r m \sin \beta $$
 Esta constante, $K_r$, ha sido calculada de forma experimental, con un valor de 
 11,484. Este valor se encuentra dentro del margen calculado, por lo que se 
 considera como válido, y verifica los cálculos realizados.
 $$K_r = 11,484$$
 Para calcular esta constante, se realizó un movimiento de 150mm, en línea recta 
-y se registraron los valores de $o_x$, que mide el desplazamiento en el eje $y$:
+y se registraron los valores de $o_1$, que mide el desplazamiento en el eje $y$:
 
 \begin{center}
 \begin{tabular}{ | c | c | c | c | c | c |}
 \hline
-$o_x$ & 1719 & 1728 & 1722 & 1719 & 1725 \\ \hline
+$o_1$ & 1719 & 1728 & 1722 & 1719 & 1725 \\ \hline
 \end{tabular}
 \end{center}
 
 Tras calcular la media, y dividirla por 150mm, se obtiene el valor $K_r$.
 
+Empleando una notación vectorial, $\vec{o}$ es el desplazamiento indicado por el 
+ratón, tras intercambiar sus ejes: $\vec{o} = (o_2, o_1)$.
 
+De forma que $o_x = o_2 = K_r m \sin \beta$ y $o_y = o_1 = K_r m \cos \beta$. Ya 
+que $m_x = m \sin \beta$ y $m_y = m \cos \beta$, se simplifica: $o_x = K_r m_x$ 
+y $o_y = K_r m_y$, quedando finalmente:
+$$ \vec{o} = K_r \vec{m} $$
+
+\subsubsection{El radio de giro $R_r$}
+Finalmente, es necesario conocer el radio de giro $R_r$ del robot. Para ello, se 
+empleará el triángulo $OA_1C_1$ que comparte el lado $R_r$ con el triángulo 
+$OA_2A_1$.
+
+Llameremos $l$ a la distancia que separa el ratón del eje de las ruedas, $l = 
+A_1C_1 = A_2C_2$. $R_m$ es el radio desde el $O$ hasta el ratón, $C_1$.
+
+Observando el ángulo $\beta$ se cumple que:
+\begin{equation}
+	\sin \beta = \frac{l}{R_m} = \frac{m_x}{m} \Longrightarrow
+		R_m = \frac{l \cdot m}{m_x}
+\label{eq:Rm}
+\end{equation}
+
+Ahora, tomando el triángulo $OA_1C_1$:
+\begin{equation}
+	R_r = R_m cos \beta = R_m \frac{m_y}{m} =
+		\frac{l \cdot m \cdot m_y}{m_x \cdot m} =
+		\frac{l \cdot m_y}{m_x}
+\label{eq:Rr}
+\end{equation}
+
+% TODO: Escribir las ecuaciones para \vec{s} usando \alpha
+
+\subsubsection{El arco recorrido $a$}
+En un giro el robot mueve el ratón en la trayectoria descrita por el arco $a$, 
+como muestra la figura~\ref{fig:giro}. Dado que el ratón gira acompañando al 
+robot, la trayectoria percibida por el mismo, es en línea recta, y de una 
+longitud exactamente igual a $a$. De forma que:
+$$m = \sqrt{m_x^2 + m_y^2} = a$$
+Si $R_m = \overline{OC_1}$, dado que  $\alpha = \widehat{A_1OA_2} = 
+\widehat{C_1OC_2}$, se tiene que $a = \alpha R_m$. Junto con lo anterior:
+$$ m = \alpha R_m $$
+Empleando la ecuación~\ref{eq:Rr}:
+\begin{equation}
+	\alpha = \frac{m}{R_m} = \frac{m \cdot m_x}{l \cdot m} = \frac{m_x}{l}
+	\label{eq:alpha}
+\end{equation}
+
+\subsubsection{Odometría}
+Para determinar la ubicación del robot, bastará con conocer la posición y el 
+ángulo del robot. De forma que $\theta_r$ indicará el ángulo del robot de forma 
+global, y $\vec{s}$ su posición.
+
+En cada giro, el robot cambiará su orientación en $\Delta\theta_r = \alpha$. De 
+forma que empleando la ecuación~\ref{eq:alpha}:
+$$ \theta_r = \sum \Delta \theta_r = \sum \alpha = \sum \frac{m_y}{l}$$
+
+Para el vector $\vec{s}$, para cada giro:
+$$ \vec{s} = \sum \Delta \vec{s} = \sum \vec{r} $$
 
 \section{Posibles errores}
 
@@ -907,8 +954,6 @@ La función \texttt{pulseIn} calcula el tiempo dependiendo de las optimizaciones
 que se produzcan. Es necesario que sea independiente. Además es conveniente
 sustituirla por alguna función no bloqueante que emplee interrupciones.
 
-%\vfill
-
 \section{TODO}
 Este documento está incompleto. Faltan cálculos en la parte de la odometría, así 
 como los experimentos que verifican la posición de robot.
@@ -918,5 +963,5 @@ los experimentos. Encontrar la ecuación que describe la luz con la distancia, e
 el LDR. Y las ecuaciones que describen el movimiento de los motores, sabiendo el 
 voltaje y tiempo de funcionamiento.
 
-%\end{multicols}
+La última versión se encuentra en \url{https://github.com/rodarima/robotica}.
 \end{document}
