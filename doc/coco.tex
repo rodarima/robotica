@@ -87,7 +87,6 @@
 		] (#3) -- (middleArc) node[pos=1.3] {#5};
 }
 \begin{document}
-
 %\maketitle
 \begin{center}
 \begin{huge}
@@ -100,7 +99,7 @@ rodrigo.arias@udc.es
 
 \newcommand\RobotAngle{45}
 \newcommand\RobotSize{2}
-\newcommand\RobotRadius{4}
+\newcommand\RobotRadius{5}
 \newcommand\RobotThetaSonar{60.0}
 
 %\begin{multicols}{2}
@@ -125,7 +124,6 @@ siguientes:
 	\item \texttt{ldr0}: Sensor de luz LDR ambiental
 	\item \texttt{ldr1}: Sensor de luz LDR dirigido hacia delante
 \end{enumerate}
-
 %\subsection{Motores}
 %Para efectuar el movimiento, dispone de dos motores Mabuchi RF-500TB-12560, 
 %colocados a ambos lados.
@@ -633,13 +631,16 @@ se observa en la figura~\ref{fig:giro} un ejemplo de un giro de $\alpha = \Robot
 	\draw[dotted] (O) -- (C1);
 
 	% Ángulos
-	\draw[dotted] (\RobotRadius/5,0) arc (0:\RobotAngle:\RobotRadius/5.0)
+	\draw[blue] (\RobotRadius/5,0) arc (0:\RobotAngle:\RobotRadius/5.0)
 		node[pos=0.5,auto=right]{$\alpha$};
-	\draw[dotted] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0)
+	\draw[red] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0)
 		node[pos=0.5,auto=left]{$\beta$};
-	\draw[dotted] (A1) +(-\RobotRadius/5,0)
+	\draw[magenta] (A1) +(-\RobotRadius/5,0)
 		arc (180:90+\RobotAngle/2:\RobotRadius/5.0)
 		node[pos=0.5,auto=left]{$\gamma$};
+	\draw[violet] (A1) +(\RobotRadius/8,0)
+		arc (0:(180+\RobotAngle)/2:\RobotRadius/8.0)
+		node[pos=0.5,auto=left]{$\phi$};
 
 	% Dibujar el robot en A1
 	\draw[] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
@@ -653,7 +654,7 @@ se observa en la figura~\ref{fig:giro} un ejemplo de un giro de $\alpha = \Robot
 	%Trayectoria raton
 	%\pgfmathsetmacro{\XValueArc}{\ArcRadius*cos(\ArcAngle)}%
 	\draw[blue] (C1) arc (-\RobotAngleAOC:\RobotAngle-\RobotAngleAOC:\RobotOC)
-		node[pos=0.5,auto=right]{$a$};
+		node[pos=0.7,auto=right]{$a$};
 
 	%\draw (0,0) coordinate [label=right:$O$] (O) circle(4);
 	\draw[dotted] (A1) arc (0:\RobotAngle:\RobotRadius);
@@ -887,7 +888,6 @@ De forma que $o_x = o_2 = K_r m \sin \beta$ y $o_y = o_1 = K_r m \cos \beta$. Ya
 que $m_x = m \sin \beta$ y $m_y = m \cos \beta$, se simplifica: $o_x = K_r m_x$ 
 y $o_y = K_r m_y$, quedando finalmente:
 $$ \vec{o} = K_r \vec{m} $$
-
 \subsubsection{El radio de giro $R_r$}
 Finalmente, es necesario conocer el radio de giro $R_r$ del robot. Para ello, se 
 empleará el triángulo $OA_1C_1$ que comparte el lado $R_r$ con el triángulo 
@@ -910,10 +910,8 @@ Ahora, tomando el triángulo $OA_1C_1$:
 		\frac{l \cdot m_y}{m_x}
 \label{eq:Rr}
 \end{equation}
-
 % TODO: Escribir las ecuaciones para \vec{s} usando \alpha
-
-\subsubsection{El arco recorrido $a$}
+\subsubsection{El ángulo $\alpha$}
 En un giro el robot mueve el ratón en la trayectoria descrita por el arco $a$, 
 como muestra la figura~\ref{fig:giro}. Dado que el ratón gira acompañando al 
 robot, la trayectoria percibida por el mismo, es en línea recta, y de una 
@@ -922,12 +920,54 @@ $$m = \sqrt{m_x^2 + m_y^2} = a$$
 Si $R_m = \overline{OC_1}$, dado que  $\alpha = \widehat{A_1OA_2} = 
 \widehat{C_1OC_2}$, se tiene que $a = \alpha R_m$. Junto con lo anterior:
 $$ m = \alpha R_m $$
-Empleando la ecuación~\ref{eq:Rr}:
+Empleando la ecuación~\ref{eq:Rm}:
 \begin{equation}
 	\alpha = \frac{m}{R_m} = \frac{m \cdot m_x}{l \cdot m} = \frac{m_x}{l}
 	\label{eq:alpha}
 \end{equation}
+\subsubsection{El vector $\vec{r}$}
+Para determinar la posición del robot, es necesario calcular el vector 
+$\vec{r}$.  Observando el ángulo $\phi$:
+$$r_x = r \cos \phi \quad
+r_y = r \sin \phi $$
+En forma matricial, empleando $R_\phi$ como matriz de rotación:
+\begin{equation}
+\vec{r} =
+\begin{bmatrix}
+r_x\\
+r_y
+\end{bmatrix}
+=
+R_\phi
+\begin{bmatrix}
+r\\
+0
+\end{bmatrix}
+=
+\begin{bmatrix}
+\cos \phi & -\sin \phi \\
+\sin \phi & \cos \phi \\
+\end{bmatrix}
+\begin{bmatrix}
+r\\
+0
+\end{bmatrix}
+\label{eq:r}
+\end{equation}
+Y ya que $r$ es la cuerda de radio $R_r$ y ángulo $\alpha$, se tiene que:
+$$ r = R_r \, \text{crd} \, \alpha = 2 R_r \sin \frac{\alpha}{2} $$
+Junto con las ecuaciones \ref{eq:alpha} y \ref{eq:Rr}:
+$$ r = 2 R_r \sin \frac{m_x}{2l} =
+	\frac{2 l m_y}{m_x} \sin \frac{m_x}{2l}$$
+Dado que existe una división por $m_x$ que valdrá 0 cuando el robot avance en 
+el eje $y$, es necesario evitar la división por cero:
 
+$$
+r = \begin{dcases}
+		\frac{l \cdot m_y}{m_x} & \text{si } m_x \ne 0 \\[1mm]
+		\frac{l \cdot m_y}{m_x} & \text{si } m_x = 0 \\
+	\end{dcases}
+$$
 \subsubsection{Odometría}
 Para determinar la ubicación del robot, bastará con conocer la posición y el 
 ángulo del robot. De forma que $\theta_r$ indicará el ángulo del robot de forma 
@@ -939,6 +979,34 @@ $$ \theta_r = \sum \Delta \theta_r = \sum \alpha = \sum \frac{m_y}{l}$$
 
 Para el vector $\vec{s}$, para cada giro:
 $$ \vec{s} = \sum \Delta \vec{s} = \sum \vec{r} $$
+\subsubsection{La posición global $\vec{s}$}
+El vector $\vec{s}\,(t)$ indica la posición global del robot en el instante $t$, 
+tomando un sistema de coordenadas globales:
+$$
+	\vec{s}\,(t+\Delta t) = \vec{s}\,(t) + \Delta \vec{s}\,(t + \Delta t)
+$$
+
+En cada movimiento del robot avanzará $\vec{r}$ en el sistema de coordenadas del 
+robot. De forma que para calcular $\Delta\vec{s}$:
+$$
+	\Delta\vec{s} = R_{\theta} \cdot \vec{r}
+$$
+Ya que $\theta$ indica el giro global del robot, $\theta = \alpha $.
+
+Substituyendo $\vec{r}$ por la ecuación~\ref{eq:r}:
+$$
+	\Delta\vec{s} = R_{\theta} \cdot R_{\phi} \vec{r} =
+		R_{\alpha + \phi} \vec{r}
+$$
+%TODO: Comprobar alpha y theta
+
+\subsubsection{El ángulo global $\theta$}
+Finalmente, en cada giro, el ángulo global cambia, y ha de actualizarse. Y ya 
+que 
+
+
+
+
 
 \section{Posibles errores}
 
@@ -953,7 +1021,6 @@ de la función:
 La función \texttt{pulseIn} calcula el tiempo dependiendo de las optimizaciones
 que se produzcan. Es necesario que sea independiente. Además es conveniente
 sustituirla por alguna función no bloqueante que emplee interrupciones.
-
 \section{TODO}
 Este documento está incompleto. Faltan cálculos en la parte de la odometría, así 
 como los experimentos que verifican la posición de robot.
