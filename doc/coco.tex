@@ -62,7 +62,6 @@
 	round-precision     = 2,
 }
 
-
 \newcommand\markangle[6][red]{% [color] {X} {origin} {Y} {mark} {radius}
 	% filled circle: red by default
 	\begin{scope}
@@ -334,12 +333,32 @@ coeficientes de la recta:
 Cuya recta (rojo) se puede observar en la figura~\ref{fig:sonar_plot}. Su 
 ecuación es:
 $$s = 238.64t + 7.8846\cdot10^{-3}$$
-\begin{center}
-%	\includegraphics[width=0.8\textwidth]{image.png}
-	\includegraphics[scale=0.58]{sonar.pdf}
-	\captionof{figure}{Valores experimentales erróneos (rojo) y correctos 
-(azul). La recta punteada es el valor teórico.\label{fig:sonar_plot}}
-\end{center}
+
+\begin{figure}
+\begin{tikzpicture}[font=\small]
+\begin{axis}[grid=both,
+	width=\columnwidth,
+	height=0.3\textheight,
+	xlabel = {Distancia del objeto (m)} ,
+	ylabel = {Tiempo de eco ($\si{\us}$)},
+	xmin = 0.2, xmax = 1.2,
+	ymin = 600, ymax = 7000,
+	legend entries={$Erróneo$,$Corregido$,$Teórico$},
+	legend columns=4,
+	legend style={
+		at={(0.5,1.1)},
+		anchor=north},
+]
+	\addplot [blue,mark=+] table[x=s, y=t1] {sonar.csv};
+	\addplot [black,mark=+] table[x=s, y=t2] {sonar.csv};
+	\addplot [red, domain=0.2:1.2, samples = 10] {\x/171*1000000}; %V_s para 18 º = 342.21
+%	\addplot[domain=-10000:10000, blue, ultra thick] {14*x - x^2};
+
+
+\end{axis}
+\end{tikzpicture}
+\caption{Valores experimentales del sensor de ultrasonidos.\label{fig:sonar_plot}}
+\end{figure}
 
 Después de repasar el programa que muestra el tiempo que tarda el pulso de 
 ultrasonidos en regresar, se ha detectado un error, provocado en una función de 
@@ -433,7 +452,8 @@ $$ V_0 = 5 \cdot \frac{l_0}{1023} $$
 En la figura~\ref{fig:ldr_circuito} se observa el montaje del LDR $R_2$, junto 
 con otra resistencia $R_1$ de un valor fijo de $10\si{\kohm}$.
 
-\begin{center}
+\begin{figure}[h]
+\centering
 \begin{tikzpicture}
 	\draw
 		(0,0) to ++(0,-1) node[ground] {}
@@ -444,8 +464,8 @@ con otra resistencia $R_1$ de un valor fijo de $10\si{\kohm}$.
 		to[short, -o] ++(0, -1) node[below] {V}
 	;
 \end{tikzpicture}
-\captionof{figure}{Circuito del sensor LDR.\label{fig:ldr_circuito}}
-\end{center}
+\caption{Circuito del sensor LDR.\label{fig:ldr_circuito}}
+\end{figure}
 
 %Para calcular el voltaje en $V_0$:
 %$$ I = \frac{V}{R_T} = \frac{V}{R_1 + R_2} $$
@@ -491,9 +511,11 @@ $s$(m) & $0º$ & $-90º$ & $+90º$ & $+180º$ \\ \hline
 \end{tabular}
 \end{center}
 
-En la siguiente figura, se puede observar en una escala logarítmica para el eje 
-y, el valor del sensor para cada orientación.
+En la figura~\ref{fig:ldr0}, se puede observar en una escala logarítmica para el 
+eje y, el valor del sensor para cada orientación.
 
+\begin{figure}[h]
+\centering
 \begin{tikzpicture}
 \begin{semilogyaxis}[grid=both,
 	width=\columnwidth,
@@ -508,12 +530,14 @@ y, el valor del sensor para cada orientación.
 		at={(0.5,1.1)},
 		anchor=north}
 ]
-	\addplot+[smooth] table[x=x, y=0] {ldr0.csv};
-	\addplot+[smooth] table[x=x, y=-90] {ldr0.csv};
-	\addplot+[smooth] table[x=x, y=90] {ldr0.csv};
-	\addplot+[smooth] table[x=x, y=180] {ldr0.csv};
+	\addplot+[mark=+] table[x=x, y=0] {ldr0.csv};
+	\addplot+[mark=+] table[x=x, y=-90] {ldr0.csv};
+	\addplot+[mark=+] table[x=x, y=90] {ldr0.csv};
+	\addplot+[mark=+] table[x=x, y=180] {ldr0.csv};
 \end{semilogyaxis}
 \end{tikzpicture}
+\caption{Resultados de calibración para \texttt{ldr0}.\label{fig:ldr0}}
+\end{figure}
 
 Existe una variación bastante marcada en la orientación de $-90º$. Esta 
 variación indica que el sensor recibe menos luz de la esperada. Dicha variación 
@@ -569,14 +593,13 @@ logarítmica para el valor del sensor.
 		at={(0.5,1.1)},
 		anchor=north}
 ]
-	\addplot+[smooth] table[x=x, y=0] {ldr1.csv};
-	\addplot+[smooth] table[x=x, y=30] {ldr1.csv};
-	\addplot+[smooth] table[x=x, y=60] {ldr1.csv};
-	\addplot+[smooth] table[x=x, y=90] {ldr1.csv};
+	\addplot +[mark=+] table[x=x, y=0] {ldr1.csv};
+	\addplot +[mark=+] table[x=x, y=30] {ldr1.csv};
+	\addplot +[mark=+] table[x=x, y=60] {ldr1.csv};
+	\addplot +[mark=+] table[x=x, y=90] {ldr1.csv};
 \end{semilogyaxis}
 \end{tikzpicture}
-\caption{Resultados del experimento de calibración de 
-\texttt{ldr1}.\label{fig:ldr1}}
+\caption{Resultados de calibración para \texttt{ldr1}.\label{fig:ldr1}}
 \end{figure}
 \subsection{\texttt{mouse0}: Ratón de bola}
 
@@ -955,40 +978,42 @@ r = \begin{dcases}
 \label{eq:r}
 \end{equation}
 \subsubsection{El ángulo global $\theta$}
-En cada giro, el ángulo global $\theta$ cambia, y ha de actualizarse. Se 
-denomina $\Delta \theta$ al giro que se produce en un intervalo $\Delta t$, tras 
-cada actualización.
-$$ \theta(t + \Delta t) = \theta(t) + \Delta \theta $$
-Observando la figura~\ref{fig:giro}, ángulo $\alpha$ indica el giro que describe 
-el robot, en $\Delta t$, por lo que $\Delta \theta = \alpha$:
+$\theta$ indica en un sistema de referencia global $S$, el ángulo del robot. En 
+cada giro cambia, y ha de actualizarse. Si $\Delta \theta$ es el giro que se 
+produce en un intervalo $\Delta t$, tras cada actualización:
+	$$ \theta(t + \Delta t) = \theta + \Delta \theta $$
+Observando la figura~\ref{fig:giro}, $\alpha$ indica el giro que describe el 
+robot, en $\Delta t$, por lo que $\Delta \theta = \alpha$:
 \begin{equation}
-	\theta(t + \Delta t) = \theta(t) + \alpha
+	\theta(t + \Delta t) = \theta + \alpha
 \end{equation}
 Siendo $\alpha$ el ángulo que gira el robot entre $t$ y $t + \Delta t$.
 
 \subsubsection{La posición global $\vec{s}$}
-El vector $\vec{s}(t)$ indica la posición global del robot en el instante $t$, 
-tomando un sistema de coordenadas globales:
+El vector $\vec{s}(t)$ indica la posición del robot en el instante $t$, tomando 
+un sistema de referencia global $S$:
 $$
 	\vec{s}(t + \Delta t) =
 		\vec{s}(t) + \Delta \vec{s}
 $$
 
-En cada movimiento del robot avanzará $\vec{r}$ en el sistema de coordenadas del 
-robot. De forma que para calcular $\Delta\vec{s}$:
+Sin embargo, el vector $\vec{r}(t)$, indicará el deplazamiento en el instante 
+$t$, pero en el sistema de referencia del robot $S'$.
+
+Para transformar el vector $\vec{r}$ de $S'$ a $S$ es necesario tener en cuenta 
+el ángulo $\theta$ que poseía el robot al comenzar el desplazamiento:
 $$
-	\Delta\vec{s} = R_{\theta(t)} \cdot \vec{r}
+	\Delta\vec{s} = R_{\theta} \vec{r}
 $$
-El ángulo $\theta$ indica el giro global del robot, $\theta = \alpha $.
 
 Substituyendo $\vec{r}$ por la ecuación~\ref{eq:r_matrix}:
 $$
-	\Delta\vec{s} = R_{\alpha} \cdot R_{\phi} \cdot
+	\Delta\vec{s} = R_{\theta} R_{\phi}
 			\begin{bmatrix}
 				r \\
 				0
 			\end{bmatrix}
-		= R_{\alpha + \phi} \cdot
+		= R_{\theta + \phi}
 			\begin{bmatrix}
 				r \\
 				0
@@ -996,29 +1021,29 @@ $$
 $$
 Realizando la multiplicación de la matriz:
 $$
-	\Delta s_x = r\cos(\alpha + \theta) \quad
-	\Delta s_y = r\sin(\alpha + \theta)
+	\Delta s_x = r\cos(\theta + \phi) \quad
+	\Delta s_y = r\sin(\theta + \phi)
 $$
 
-De forma que en cada $\Delta t$, la posición de actualizará:
+De forma que para cada $\Delta t$:
 \begin{equation}
 \begin{split}
-	s_x(t + \Delta t) = s_x(t) + r\cos(\alpha + \theta) \\
-	s_y(t + \Delta t) = s_y(t) + r\sin(\alpha + \theta)
+	s_x(t + \Delta t) = s_x(t) + r\cos(\theta + \phi) \\
+	s_y(t + \Delta t) = s_y(t) + r\sin(\theta + \phi)
 \end{split}
+\label{eq:s}
 \end{equation}
 
 \subsubsection{Odometría}
 Para determinar la ubicación del robot, bastará con conocer la posición y el 
-ángulo del robot. De forma que $\theta_r$ indicará el ángulo del robot de forma 
-global, y $\vec{s}$ su posición.
+ángulo del robot, usando el sistema de referencia global $S$. De esta forma, la 
+tupla $(\vec{s}, \theta)$ contiene toda la información necesaria para ubicar al 
+robot.
 
-En cada giro, el robot cambiará su orientación en $\Delta\theta_r = \alpha$. De 
-forma que empleando la ecuación~\ref{eq:alpha}:
-$$ \theta_r = \sum \Delta \theta_r = \sum \alpha = \sum \frac{m_y}{l}$$
+Cada vez que el sensor \texttt{mouse0}, indique el vector $\vec{o}$, ha de 
+calcularse $\vec{m}$. Luego actualizar la posición global $\vec{s}$ y finalmente 
+el ángulo global $\theta$.
 
-Para el vector $\vec{s}$, para cada giro:
-$$ \vec{s} = \sum \Delta \vec{s} = \sum \vec{r} $$
 
 
 
