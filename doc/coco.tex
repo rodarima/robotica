@@ -592,103 +592,7 @@ Ya que los movimientos efectuados por el robot serán los que provoquen sus dos 
 se puede determinar la posición, midiendo sólo el desplazamiento del ratón. Para ello,
 se observa en la figura~\ref{fig:giro} un ejemplo de un giro de $\alpha = \RobotAngleº$.
 
-\begin{center}
-\begin{tikzpicture}[>=latex,semithick]
-	%\path[draw] (-4,0)  coordinate [label= left:$A$] (A)
-	%        -- ( 0,4)  coordinate [label=above:$C$] (C)
-%        -- ( 4,0)  coordinate [label=right:$B$] (B)
-	%        -- cycle;
-	%\foreach \point in {A,B,C}
-	%       \fill [black] (\point) circle (2pt);
-	%\draw [color=red] circle(4cm);
 
-
-	%\draw (A) rectangle (1,1);
-
-	%\def\robotsize{(1,1)}
-	%\pgfmathsetmacro{\RobotSize}{2.0}%
-	%\pgfmathsetmacro{\RobotAngle}{-45.0}%
-	%\pgfmathsetmacro{\RobotRadius}{6.0}%
-	\pgfmathsetmacro{\RobotBall}{0.15}%
-	\pgfmathsetmacro{\RobotOC}{sqrt(\RobotSize*\RobotSize +
-		\RobotRadius*\RobotRadius)}%
-	\pgfmathsetmacro{\RobotAngleAOC}{atan(\RobotSize/\RobotRadius)}%
-	\def\BallBeta{\RobotAngleAOC}
-
-
-	\fill [black] (0,0) coordinate [label=left:$O$] (O) circle (1pt);
-	\fill [black] (0:\RobotRadius) coordinate [label=below:$A_1$] (A1)
-		circle (1pt);
-	\fill [black] (\RobotAngle:\RobotRadius) coordinate [label=above:$A_2$] (A2)
-		circle (1pt);
-	\fill (A1) +(0,-\RobotSize) coordinate [label=below:$C_1$] (C1) circle (1pt);
-	\fill[rotate=\RobotAngle] (A2) +(0,-\RobotSize) coordinate [label=above:$C_2$]
-		(C2) circle (1pt);
-
-
-	\draw[dotted] (O) -- (A1);
-	\draw[dotted] (O) -- (A2);
-	\draw[dotted] (O) -- (C1);
-
-	% Ángulos
-	\draw[blue] (\RobotRadius/5,0) arc (0:\RobotAngle:\RobotRadius/5.0)
-		node[pos=0.5,auto=right]{$\alpha$};
-	\draw[red] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0)
-		node[pos=0.5,auto=left]{$\beta$};
-	\draw[magenta] (A1) +(-\RobotRadius/5,0)
-		arc (180:90+\RobotAngle/2:\RobotRadius/5.0)
-		node[pos=0.5,auto=left]{$\gamma$};
-	\draw[violet] (A1) +(\RobotRadius/8,0)
-		arc (0:(180+\RobotAngle)/2:\RobotRadius/8.0)
-		node[pos=0.5,auto=left]{$\phi$};
-
-	% Dibujar el robot en A1
-	\draw[] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
-	\draw[dotted] (C1) circle(\RobotBall);
-
-	%Dibujar el robot en A2
-	\draw[rotate=\RobotAngle] (A2) +(-\RobotSize/2,0)
-		rectangle +(\RobotSize/2,-\RobotSize);
-	\draw[dotted] (C2) circle(\RobotBall);
-
-	%Trayectoria raton
-	%\pgfmathsetmacro{\XValueArc}{\ArcRadius*cos(\ArcAngle)}%
-	\draw[blue] (C1) arc (-\RobotAngleAOC:\RobotAngle-\RobotAngleAOC:\RobotOC)
-		node[pos=0.7,auto=right]{$a$};
-
-	%\draw (0,0) coordinate [label=right:$O$] (O) circle(4);
-	\draw[dotted] (A1) arc (0:\RobotAngle:\RobotRadius);
-	\draw[-latex,shorten >=1pt] (A1) -- (A2) node[pos=0.5,auto=right]{$\vec{r}$};
-
-	%Dibujar el vector del raton
-	\draw[red,-latex,shorten >=1pt] (C1) -- +(90-\RobotAngleAOC:\RobotRadius/3)
-		node[pos=0.5,auto=right]{$\vec{m}$};
-
-
-\end{tikzpicture}
-\captionof{figure}{Diagrama de un giro del robot.\label{fig:giro}}
-\end{center}
-
-El vector $\vec{r}$ indica el movimiento que realizó el robot. Parte del punto 
-$A_1$, y gira de forma circular, con centro en $O$, hasta $A_2$, con un ángulo 
-$\alpha$.
-
-Conociendo el ángulo $\gamma$:
-$$ R' = \overline{OA_1} \quad R = \overline{OC_1} $$
-$$
-r_x = \begin{cases}
-		R'(1-\cos \gamma) & \text{si } \gamma < 0\\
-		-R'(1-\cos \gamma) & \text{si } \gamma > 0\\
-		0 & \text{si } \gamma = 0\\
-	\end{cases}
-$$
-$$
-r_y = \begin{cases}
-		-R'(\sin \gamma) & \text{si } \gamma < 0\\
-		R'(\sin \gamma) & \text{si } \gamma > 0\\
-		m_x & \text{si } \gamma = 0\\
-	\end{cases}
-$$
 \subsubsection{Movimiento de la bola}
 Para poder analizar el movimiento que realizará el robot, mediante la 
 información que el ratón proporciona, es necesario conocer como varía el vector 
@@ -706,7 +610,8 @@ detalle el mismo giro que en la figura~\ref{fig:giro}.
 
 % TODO: Poner los ejes en la figura y R
 
-\begin{center}
+\begin{figure}[h]
+\centering
 \begin{tikzpicture}[>=latex, semithick]
 	\pgfmathsetmacro{\BallRadius}{3.0}%
 	\pgfmathsetmacro{\BallOptoL}{2}%
@@ -778,7 +683,7 @@ detalle el mismo giro que en la figura~\ref{fig:giro}.
 
 \end{tikzpicture}
 \captionof{figure}{Diagrama de la bola del ratón.\label{fig:bola}}
-\end{center}
+\end{figure}
 \subsubsection{El tamaño de la bola}
 
 ¿Cómo se mueven los rodillos del ratón, cuando la bola gira? Para responder a 
@@ -887,14 +792,94 @@ ratón, tras intercambiar sus ejes: $\vec{o} = (o_2, o_1)$.
 De forma que $o_x = o_2 = K_r m \sin \beta$ y $o_y = o_1 = K_r m \cos \beta$. Ya 
 que $m_x = m \sin \beta$ y $m_y = m \cos \beta$, se simplifica: $o_x = K_r m_x$ 
 y $o_y = K_r m_y$, quedando finalmente:
-$$ \vec{o} = K_r \vec{m} $$
+\begin{equation}
+	\vec{o} = K_r \vec{m} \Longrightarrow \vec{m} = \frac{\vec{o}}{K_r}
+	\label{eq:o}
+\end{equation}
 \subsubsection{El radio de giro $R_r$}
-Finalmente, es necesario conocer el radio de giro $R_r$ del robot. Para ello, se 
-empleará el triángulo $OA_1C_1$ que comparte el lado $R_r$ con el triángulo 
-$OA_2A_1$.
 
-Llameremos $l$ a la distancia que separa el ratón del eje de las ruedas, $l = 
-A_1C_1 = A_2C_2$. $R_m$ es el radio desde el $O$ hasta el ratón, $C_1$.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[>=latex,semithick]
+	%\path[draw] (-4,0)  coordinate [label= left:$A$] (A)
+	%        -- ( 0,4)  coordinate [label=above:$C$] (C)
+%        -- ( 4,0)  coordinate [label=right:$B$] (B)
+	%        -- cycle;
+	%\foreach \point in {A,B,C}
+	%       \fill [black] (\point) circle (2pt);
+	%\draw [color=red] circle(4cm);
+
+
+	%\draw (A) rectangle (1,1);
+
+	%\def\robotsize{(1,1)}
+	%\pgfmathsetmacro{\RobotSize}{2.0}%
+	%\pgfmathsetmacro{\RobotAngle}{-45.0}%
+	%\pgfmathsetmacro{\RobotRadius}{6.0}%
+	\pgfmathsetmacro{\RobotBall}{0.15}%
+	\pgfmathsetmacro{\RobotOC}{sqrt(\RobotSize*\RobotSize +
+		\RobotRadius*\RobotRadius)}%
+	\pgfmathsetmacro{\RobotAngleAOC}{atan(\RobotSize/\RobotRadius)}%
+	\def\BallBeta{\RobotAngleAOC}
+
+
+	\fill [black] (0,0) coordinate [label=left:$O$] (O) circle (1pt);
+	\fill [black] (0:\RobotRadius) coordinate [label=below:$A_1$] (A1)
+		circle (1pt);
+	\fill [black] (\RobotAngle:\RobotRadius) coordinate [label=above:$A_2$] (A2)
+		circle (1pt);
+	\fill (A1) +(0,-\RobotSize) coordinate [label=below:$C_1$] (C1) circle (1pt);
+	\fill[rotate=\RobotAngle] (A2) +(0,-\RobotSize) coordinate [label=above:$C_2$]
+		(C2) circle (1pt);
+
+
+	\draw[dotted] (O) -- (A1);
+	\draw[dotted] (O) -- (A2);
+	\draw[dotted] (O) -- (C1);
+
+	% Ángulos
+	\draw[blue] (\RobotRadius/5,0) arc (0:\RobotAngle:\RobotRadius/5.0)
+		node[pos=0.5,auto=right]{$\alpha$};
+	\draw[red] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0)
+		node[pos=0.5,auto=left]{$\beta$};
+	\draw[magenta] (A1) +(-\RobotRadius/5,0)
+		arc (180:90+\RobotAngle/2:\RobotRadius/5.0)
+		node[pos=0.5,auto=left]{$\gamma$};
+	\draw[violet] (A1) +(\RobotRadius/8,0)
+		arc (0:(180+\RobotAngle)/2:\RobotRadius/8.0)
+		node[pos=0.5,auto=left]{$\phi$};
+
+	% Dibujar el robot en A1
+	\draw[] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
+	\draw[dotted] (C1) circle(\RobotBall);
+
+	%Dibujar el robot en A2
+	\draw[rotate=\RobotAngle] (A2) +(-\RobotSize/2,0)
+		rectangle +(\RobotSize/2,-\RobotSize);
+	\draw[dotted] (C2) circle(\RobotBall);
+
+	%Trayectoria raton
+	%\pgfmathsetmacro{\XValueArc}{\ArcRadius*cos(\ArcAngle)}%
+	\draw[blue] (C1) arc (-\RobotAngleAOC:\RobotAngle-\RobotAngleAOC:\RobotOC)
+		node[pos=0.7,auto=right]{$a$};
+
+	%\draw (0,0) coordinate [label=right:$O$] (O) circle(4);
+	\draw[dotted] (A1) arc (0:\RobotAngle:\RobotRadius);
+	\draw[-latex,shorten >=1pt] (A1) -- (A2) node[pos=0.5,auto=right]{$\vec{r}$};
+
+	%Dibujar el vector del raton
+	\draw[red,-latex,shorten >=1pt] (C1) -- +(90-\RobotAngleAOC:\RobotRadius/3)
+		node[pos=0.5,auto=right]{$\vec{m}$};
+
+
+\end{tikzpicture}
+\captionof{figure}{Diagrama de un giro del robot.\label{fig:giro}}
+\end{figure}
+Para calcular el radio de giro $R_r$ del robot se empleará el triángulo 
+$OA_1C_1$ que comparte el lado $R_r$ con el triángulo $OA_2A_1$.
+
+$l$ es la distancia que separa el ratón del eje de las ruedas, $l = 
+\overline{A_1C_1}$. $R_m$ es el radio desde el $O$ hasta el ratón, $C_1$.
 
 Observando el ángulo $\beta$ se cumple que:
 \begin{equation}
@@ -910,7 +895,6 @@ Ahora, tomando el triángulo $OA_1C_1$:
 		\frac{l \cdot m_y}{m_x}
 \label{eq:Rr}
 \end{equation}
-% TODO: Escribir las ecuaciones para \vec{s} usando \alpha
 \subsubsection{El ángulo $\alpha$}
 En un giro el robot mueve el ratón en la trayectoria descrita por el arco $a$, 
 como muestra la figura~\ref{fig:giro}. Dado que el ratón gira acompañando al 
@@ -927,7 +911,8 @@ Empleando la ecuación~\ref{eq:Rm}:
 \end{equation}
 \subsubsection{El vector $\vec{r}$}
 Para determinar la posición del robot, es necesario calcular el vector 
-$\vec{r}$.  Observando el ángulo $\phi$:
+$\vec{r}$. Este vector indica el deplazamiento del robot, usando un sistema de 
+coordenadas local. Observando el ángulo $\phi$:
 $$r_x = r \cos \phi \quad
 r_y = r \sin \phi $$
 En forma matricial, empleando $R_\phi$ como matriz de rotación:
@@ -952,7 +937,7 @@ r\\
 r\\
 0
 \end{bmatrix}
-\label{eq:r}
+\label{eq:r_matrix}
 \end{equation}
 Y ya que $r$ es la cuerda de radio $R_r$ y ángulo $\alpha$, se tiene que:
 $$ r = R_r \, \text{crd} \, \alpha = 2 R_r \sin \frac{\alpha}{2} $$
@@ -962,12 +947,67 @@ $$ r = 2 R_r \sin \frac{m_x}{2l} =
 Dado que existe una división por $m_x$ que valdrá 0 cuando el robot avance en 
 el eje $y$, es necesario evitar la división por cero:
 
-$$
+\begin{equation}
 r = \begin{dcases}
-		\frac{l \cdot m_y}{m_x} & \text{si } m_x \ne 0 \\[1mm]
-		\frac{l \cdot m_y}{m_x} & \text{si } m_x = 0 \\
+		\frac{2 l m_y}{m_x} \sin \frac{m_x}{2l} & \text{si } m_x \ne 0 \\[1mm]
+		m_y & \text{si } m_x = 0 \\
 	\end{dcases}
+\label{eq:r}
+\end{equation}
+\subsubsection{El ángulo global $\theta$}
+En cada giro, el ángulo global $\theta$ cambia, y ha de actualizarse. Se 
+denomina $\Delta \theta$ al giro que se produce en un intervalo $\Delta t$, tras 
+cada actualización.
+$$ \theta(t + \Delta t) = \theta(t) + \Delta \theta $$
+Observando la figura~\ref{fig:giro}, ángulo $\alpha$ indica el giro que describe 
+el robot, en $\Delta t$, por lo que $\Delta \theta = \alpha$:
+\begin{equation}
+	\theta(t + \Delta t) = \theta(t) + \alpha
+\end{equation}
+Siendo $\alpha$ el ángulo que gira el robot entre $t$ y $t + \Delta t$.
+
+\subsubsection{La posición global $\vec{s}$}
+El vector $\vec{s}(t)$ indica la posición global del robot en el instante $t$, 
+tomando un sistema de coordenadas globales:
 $$
+	\vec{s}(t + \Delta t) =
+		\vec{s}(t) + \Delta \vec{s}
+$$
+
+En cada movimiento del robot avanzará $\vec{r}$ en el sistema de coordenadas del 
+robot. De forma que para calcular $\Delta\vec{s}$:
+$$
+	\Delta\vec{s} = R_{\theta(t)} \cdot \vec{r}
+$$
+El ángulo $\theta$ indica el giro global del robot, $\theta = \alpha $.
+
+Substituyendo $\vec{r}$ por la ecuación~\ref{eq:r_matrix}:
+$$
+	\Delta\vec{s} = R_{\alpha} \cdot R_{\phi} \cdot
+			\begin{bmatrix}
+				r \\
+				0
+			\end{bmatrix}
+		= R_{\alpha + \phi} \cdot
+			\begin{bmatrix}
+				r \\
+				0
+			\end{bmatrix}
+$$
+Realizando la multiplicación de la matriz:
+$$
+	\Delta s_x = r\cos(\alpha + \theta) \quad
+	\Delta s_y = r\sin(\alpha + \theta)
+$$
+
+De forma que en cada $\Delta t$, la posición de actualizará:
+\begin{equation}
+\begin{split}
+	s_x(t + \Delta t) = s_x(t) + r\cos(\alpha + \theta) \\
+	s_y(t + \Delta t) = s_y(t) + r\sin(\alpha + \theta)
+\end{split}
+\end{equation}
+
 \subsubsection{Odometría}
 Para determinar la ubicación del robot, bastará con conocer la posición y el 
 ángulo del robot. De forma que $\theta_r$ indicará el ángulo del robot de forma 
@@ -979,30 +1019,10 @@ $$ \theta_r = \sum \Delta \theta_r = \sum \alpha = \sum \frac{m_y}{l}$$
 
 Para el vector $\vec{s}$, para cada giro:
 $$ \vec{s} = \sum \Delta \vec{s} = \sum \vec{r} $$
-\subsubsection{La posición global $\vec{s}$}
-El vector $\vec{s}\,(t)$ indica la posición global del robot en el instante $t$, 
-tomando un sistema de coordenadas globales:
-$$
-	\vec{s}\,(t+\Delta t) = \vec{s}\,(t) + \Delta \vec{s}\,(t + \Delta t)
-$$
 
-En cada movimiento del robot avanzará $\vec{r}$ en el sistema de coordenadas del 
-robot. De forma que para calcular $\Delta\vec{s}$:
-$$
-	\Delta\vec{s} = R_{\theta} \cdot \vec{r}
-$$
-Ya que $\theta$ indica el giro global del robot, $\theta = \alpha $.
 
-Substituyendo $\vec{r}$ por la ecuación~\ref{eq:r}:
-$$
-	\Delta\vec{s} = R_{\theta} \cdot R_{\phi} \vec{r} =
-		R_{\alpha + \phi} \vec{r}
-$$
-%TODO: Comprobar alpha y theta
 
-\subsubsection{El ángulo global $\theta$}
-Finalmente, en cada giro, el ángulo global cambia, y ha de actualizarse. Y ya 
-que 
+
 
 
 
