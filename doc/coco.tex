@@ -1046,6 +1046,27 @@ el ángulo global $\theta$.
 
 
 
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+\begin{axis}[grid=both,
+	axis equal,
+	width=\columnwidth,
+%	height=0.4\textheight,
+	xlabel = {x (m)},
+	ylabel = {y (m)},
+%	xmin = -120.0, xmax = 0,
+%	ymin = 0, ymax = 60,
+]
+	\addplot [blue] table[x=sx, y=sy] {180-cerrado.csv};
+	\draw[red] (axis cs:-106,-3) circle[radius=4];
+
+%	\addplot [red, domain=0.2:1.2, samples = 10, parametric] {\x/171*1000000}; %V_s para 18 º = 342.21
+\end{axis}
+\end{tikzpicture}
+\caption{Giro de 180º. Se observa que excede el giro, debido a la inercia de los
+motores.\label{fig:giro-180}}
+\end{figure}
 
 
 
