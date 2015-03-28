@@ -123,10 +123,22 @@ siguientes:
 	\item \texttt{ldr0}: Sensor de luz LDR ambiental
 	\item \texttt{ldr1}: Sensor de luz LDR dirigido hacia delante
 \end{enumerate}
-%\subsection{Motores}
-%Para efectuar el movimiento, dispone de dos motores Mabuchi RF-500TB-12560, 
-%colocados a ambos lados.
-%TODO: Completar descripción
+\subsection{Actuadores}
+El robot dispone de dos motores DC a ambos lados que le permiten moverse por el 
+entorno. También puede emitir señales a través de sus leds. Incluye tres LEDS en 
+la parte frontal, que conjuntamente con el sensor \texttt{ldr1}, le permiten 
+apreciar el color del objeto que tiene delante. A continuación:
+\begin{enumerate}
+	% Quitar espacio entre lineas
+	\setlength{\parskip}{0cm}
+
+	\item \texttt{mtr}: Motor derecho
+	\item \texttt{mtl}: Motor izquierdo
+	\item \texttt{ledr}: LED frontal rojo.
+	\item \texttt{ledg}: LED frontal verde.
+	\item \texttt{ledb}: LED frontal azul.
+	\item \texttt{led0}: LED de información.
+\end{enumerate}
 
 
 \section{Calibración de sensores}
@@ -274,17 +286,17 @@ $\pm5$mm & $\pm1º$ & $\pm1º$ \\ \hline \hline
 \end{tabular}
 \end{center}
 
-Analizamos ahora la media aritmética, la desviación típica y la dispersión 
-muestral o varianza de los valores de $\theta_1$ y $\theta_2$, respectivamente:
-$$ \overline{\theta_1} = 29,875 \quad s(\theta_1) = 0,99103 \quad s^2(\theta_1) 
-= 0.98214 $$
-$$ \overline{\theta_2} = 27,75 \quad s(\theta_2) = 1,0351 \quad s^2(\theta_2) = 
-1.0714 $$
-De forma que se aproxima el valor a:
+%Analizamos ahora la media aritmética, la desviación típica y la dispersión 
+%muestral o varianza de los valores de $\theta_1$ y $\theta_2$, respectivamente:
+%$$ \overline{\theta_1} = 29,875 \quad s(\theta_1) = 0,99103 \quad s^2(\theta_1) 
+%= 0.98214 $$
+%$$ \overline{\theta_2} = 27,75 \quad s(\theta_2) = 1,0351 \quad s^2(\theta_2) = 
+%1.0714 $$
+De forma que se aproxima el valor empleando la media aritmética a:
 $$ \theta_1 = 30 \pm 1º \quad \theta_2 = 28 \pm 1º $$
 %$$\mu_{\theta_s} = \mu_{\theta_1} + \mu_{\theta_2} = 57,625 $$
 %$$\sigma_{\theta_s} = \sqrt{\sigma_{\theta_1}^2 + \sigma_{\theta_2}^2} = 2,0261 $$
-Finalmente, aproximando $\theta_s$:
+Finalmente, para $\theta_s$:
 $$\theta_s = 58 \pm 2º$$
 
 El fabricante indica un ángulo de apertura de 60º, centrado, con 30º hacia cada 
@@ -856,21 +868,30 @@ y $o_y = K_r m_y$, quedando finalmente:
 		(C2) circle (1pt);
 
 
-	\draw[dotted] (O) -- (A1);
+	\draw (O) -- (A1) node[pos=0.5,auto=left]{$R_r$};
+	\draw (O) -- (C1) node[pos=0.5,auto=right]{$R_m$};
+%	\draw[dotted] (O) -- (A1);
 	\draw[dotted] (O) -- (A2);
-	\draw[dotted] (O) -- (C1);
+%	\draw[dotted] (O) -- (C1);
 
 	% Ángulos
 	\draw[blue] (\RobotRadius/5,0) arc (0:\RobotAngle:\RobotRadius/5.0)
 		node[pos=0.5,auto=right]{$\alpha$};
-	\draw[red] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0)
-		node[pos=0.5,auto=left]{$\beta$};
+%	\draw[red] (\RobotRadius/5,0) arc (0:-\RobotAngleAOC:\RobotRadius/5.0)
+%		node[pos=0.125,auto=left]{$\beta$};
 	\draw[magenta] (A1) +(-\RobotRadius/5,0)
 		arc (180:90+\RobotAngle/2:\RobotRadius/5.0)
 		node[pos=0.5,auto=left]{$\gamma$};
 	\draw[violet] (A1) +(\RobotRadius/8,0)
 		arc (0:(180+\RobotAngle)/2:\RobotRadius/8.0)
 		node[pos=0.5,auto=left]{$\phi$};
+
+	%Ängulo beta
+	\begin{scope}
+		\path[clip] (A1) -- (O) -- (C1) -- cycle;
+		\draw[red] (O) circle (\RobotRadius/5);
+		\node[red,right] at ($(O) +(-\RobotAngleAOC/2:\RobotRadius/5)$) {$\beta$};
+	\end{scope}
 
 	% Dibujar el robot en A1
 	\draw[] (A1) +(-\RobotSize/2,0) rectangle +(\RobotSize/2,-\RobotSize);
@@ -1045,6 +1066,107 @@ calcularse $\vec{m}$. Luego actualizar la posición global $\vec{s}$ y finalment
 el ángulo global $\theta$.
 
 
+\subsection{Motores}
+Para efectuar el movimiento, el robot dispone de dos motores Mabuchi 
+RF-500TB-12560, colocados a ambos lados. Estos motores eléctricos de corriente 
+contínua, son rápidos y ligeros, pero no tienen la precisión de los motores paso 
+a paso. Así que para poder controlar la velocidad y aceleración, es necesario 
+realizar una serie de pruebas de calibración.
+
+\subsubsection{Relación velocidad-voltaje}
+Aplicando diferentes configuraciones de ondas PWM, es posible variar la 
+velocidad de los motores con arduino. De modo que se ha realizado un experimento 
+en el que el robot ejecuta un movimiento en línea recta durante 2 segundos, 
+manteniendo una alimentación constante en ambos motores. El resultado puede 
+verse en la figura~\ref{fig:velocidad-voltaje}.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+\begin{axis}[grid=both,
+	no markers,
+%	axis equal,
+	width=\columnwidth,
+%	height=0.5\textheight,
+	xlabel = {t (s)},
+	ylabel = {v (mm/s)},
+	legend entries={$40\%$,$50\%$,$60\%$,$70\%$,$80\%$,$90\%$,$100\%$},
+	legend columns=4,
+	legend style={
+		at={(0.5,1.25)},
+		anchor=north},
+%	xmin = -120.0, xmax = 0,
+%	ymin = -0.15, ymax = 1,
+	ymin = -5,
+]
+	\addplot table[x=t, y=v] {velocidad-voltaje-4-s.csv};
+	\addplot table[x=t, y=v] {velocidad-voltaje-5-s.csv};
+	\addplot table[x=t, y=v] {velocidad-voltaje-6-s.csv};
+	\addplot table[x=t, y=v] {velocidad-voltaje-7-s.csv};
+	\addplot table[x=t, y=v] {velocidad-voltaje-8-s.csv};
+	\addplot table[x=t, y=v] {velocidad-voltaje-9-s.csv};
+	\addplot table[x=t, y=v] {velocidad-voltaje-10-s.csv};
+	\draw[black] (axis cs:0,0) -- (axis cs:0,40);
+	\draw[black] (axis cs:2,0) -- (axis cs:2,40);
+	\node[pin=-10:Arranque.] at (0,0) {};
+	\node[pin=180+10:Apagado.] at (2,0) {};
+
+%	\addplot [red, domain=0.2:1.2, samples = 10, parametric] {\x/171*1000000}; %V_s para 18 º = 342.21
+\end{axis}
+\end{tikzpicture}
+\caption{Arranque y parada de los motores, con diferente ciclo de trabajo, a 5V.  
+Se observa una curva de arranque, y otra de detención, debido a la inercia.
+\label{fig:velocidad-voltaje}}
+\end{figure}
+
+Se observa que al comienzo, los motores experimentan una aceleración, tras la 
+cual, se estabilizan en una velocidad relativamente constante, y finalmente se 
+detienen tras un período de frenado.
+
+Es importante conocer la velocidad de los motores, para poder tener una mejor 
+información de odometría. En la figura~\ref{fig:velocidad-pwm} se observa como 
+aumenta la velocidad conforme se aumenta el ciclo de trabajo de la onda PWM.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+\begin{axis}[grid=both,
+%no markers,
+%	axis equal,
+	width=\columnwidth,
+%	height=0.5\textheight,
+	xlabel = {PWM \%},
+	ylabel = {v (mm/s)},
+	legend entries={$Real$,$Interpolación$},
+	legend pos=south east,
+%	legend columns=4,
+%	legend style={
+%		at={(0.5,1.25)},
+%		anchor=north},
+%	xmin = -120.0, xmax = 0,
+%	ymin = -0.15, ymax = 1,
+	ymin = -5,
+]
+	\addplot table[x=p, y=v] {velocidad-voltaje2.csv};
+	\addplot[black,domain=0.2:1, samples=10] {x*41.9103-8.4458};
+
+%	\addplot [red, domain=0.2:1.2, samples = 10, parametric] {\x/171*1000000}; %V_s para 18 º = 342.21
+\end{axis}
+\end{tikzpicture}
+\caption{Arranque y parada de los motores, con diferente ciclo de trabajo, a 5V.  
+Se observa una curva de arranque, y otra de detención, debido a la inercia.
+\label{fig:velocidad-pwm}}
+	\end{figure}
+
+Las ecuaciones que describen la aceleración del motor permitirían contrastar la 
+forma de la función. Sin embargo, no serán analizadas aquí, debido a la gran 
+complejidad que conforma un motor. Para estimar la gráfica, se realizará una 
+aproximación lineal. La interpolación que se muestra en la 
+figura~\ref{fig:velocidad-pwm} es la siguiente recta:
+$$ f(x)=41.9103x - 8.4458$$
+
+
+
 
 \begin{figure}[h]
 \centering
@@ -1064,10 +1186,9 @@ el ángulo global $\theta$.
 %	\addplot [red, domain=0.2:1.2, samples = 10, parametric] {\x/171*1000000}; %V_s para 18 º = 342.21
 \end{axis}
 \end{tikzpicture}
-\caption{Giro de 180º. Se observa que excede el giro, debido a la inercia de los
-motores.\label{fig:giro-180}}
+\caption{Giro de 180º. Se observa que excede el giro en unos 5,5º, debido a la 
+inercia de los motores.\label{fig:giro-180}}
 \end{figure}
-
 
 
 
