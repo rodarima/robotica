@@ -39,7 +39,7 @@ AVRDUDE_FORMAT=:i
 
 # Arduino libraries version and path to sources and headers
 ARDUINO_VERSION = 100
-ARDUINO_SRC = /usr/share/arduino/hardware/arduino/cores/$(CORE) /usr/share/arduino/hardware/arduino/variants/$(VARIANT) ./timer2 ./serialmouse
+ARDUINO_SRC = /usr/share/arduino/hardware/arduino/cores/$(CORE) /usr/share/arduino/hardware/arduino/variants/$(VARIANT)
 #/usr/share/arduino/libraries/AltSoftSerial /usr/share/arduino/libraries/TimerOne /usr/share/arduino/libraries/SoftwareSerial 
 # ... insert additional libs here ^^^, for example, /usr/share/arduino/libraries/EEPROM
 
@@ -70,12 +70,12 @@ CDEFS = -DF_CPU=$(F_CPU) -DARDUINO=$(ARDUINO_VERSION)
 CXXDEFS = -DF_CPU=$(F_CPU) -DARDUINO=$(ARDUINO_VERSION)
 
 # Place -I options here
-CINCS = $(shell for path in $(ARDUINO_LOCAL_SRC); do echo -n "-I$$path "; done) -I./
-CXXINCS = $(shell for path in $(ARDUINO_LOCAL_SRC); do echo -n "-I$$path "; done) -I./
+CINCS = $(shell for path in $(ARDUINO_LOCAL_SRC); do echo -n "-I$$path "; done) -I./ -I./lib/
+CXXINCS = $(shell for path in $(ARDUINO_LOCAL_SRC); do echo -n "-I$$path "; done) -I./ -I./lib/
 
 # Compiler and linker options from Arduino IDE
-CFLAGS = -Wall -O2 -g -fno-use-cxa-atexit -w -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CDEFS) $(CINCS)
-CXXFLAGS = -Wall -O2 -g -fno-use-cxa-atexit -w -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CXXDEFS) $(CXXINCS)
+CFLAGS = -Wall -O2 -fno-use-cxa-atexit -w -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CDEFS) $(CINCS)
+CXXFLAGS = -Wall -O2 -fno-use-cxa-atexit -w -fno-exceptions -ffunction-sections -fdata-sections -mmcu=$(MCU) $(CXXDEFS) $(CXXINCS)
 LDFLAGS = -Wl,--gc-section
 
 
