@@ -361,8 +361,8 @@ $$s = 238.64t + 7.8846\cdot10^{-3}$$
 		at={(0.5,1.1)},
 		anchor=north},
 ]
-	\addplot [blue,mark=+] table[x=s, y=t1] {sonar.csv};
-	\addplot [black,mark=+] table[x=s, y=t2] {sonar.csv};
+	\addplot [blue,mark=+] table[x=s, y=t1] {csv/sonar.csv};
+	\addplot [black,mark=+] table[x=s, y=t2] {csv/sonar.csv};
 	\addplot [red, domain=0.2:1.2, samples = 10] {\x/171*1000000}; %V_s para 18 º = 342.21
 %	\addplot[domain=-10000:10000, blue, ultra thick] {14*x - x^2};
 
@@ -542,10 +542,10 @@ eje y, el valor del sensor para cada orientación.
 		at={(0.5,1.1)},
 		anchor=north}
 ]
-	\addplot+[mark=+] table[x=x, y=0] {ldr0.csv};
-	\addplot+[mark=+] table[x=x, y=-90] {ldr0.csv};
-	\addplot+[mark=+] table[x=x, y=90] {ldr0.csv};
-	\addplot+[mark=+] table[x=x, y=180] {ldr0.csv};
+	\addplot+[mark=+] table[x=x, y=0] {csv/ldr0.csv};
+	\addplot+[mark=+] table[x=x, y=-90] {csv/ldr0.csv};
+	\addplot+[mark=+] table[x=x, y=90] {csv/ldr0.csv};
+	\addplot+[mark=+] table[x=x, y=180] {csv/ldr0.csv};
 \end{semilogyaxis}
 \end{tikzpicture}
 \caption{Resultados de calibración para \texttt{ldr0}.\label{fig:ldr0}}
@@ -605,10 +605,10 @@ logarítmica para el valor del sensor.
 		at={(0.5,1.1)},
 		anchor=north}
 ]
-	\addplot +[mark=+] table[x=x, y=0] {ldr1.csv};
-	\addplot +[mark=+] table[x=x, y=30] {ldr1.csv};
-	\addplot +[mark=+] table[x=x, y=60] {ldr1.csv};
-	\addplot +[mark=+] table[x=x, y=90] {ldr1.csv};
+	\addplot +[mark=+] table[x=x, y=0] {csv/ldr1.csv};
+	\addplot +[mark=+] table[x=x, y=30] {csv/ldr1.csv};
+	\addplot +[mark=+] table[x=x, y=60] {csv/ldr1.csv};
+	\addplot +[mark=+] table[x=x, y=90] {csv/ldr1.csv};
 \end{semilogyaxis}
 \end{tikzpicture}
 \caption{Resultados de calibración para \texttt{ldr1}.\label{fig:ldr1}}
@@ -1099,13 +1099,13 @@ verse en la figura~\ref{fig:velocidad-voltaje}.
 %	ymin = -0.15, ymax = 1,
 	ymin = -5,
 ]
-	\addplot table[x=t, y=v] {velocidad-voltaje-4-s.csv};
-	\addplot table[x=t, y=v] {velocidad-voltaje-5-s.csv};
-	\addplot table[x=t, y=v] {velocidad-voltaje-6-s.csv};
-	\addplot table[x=t, y=v] {velocidad-voltaje-7-s.csv};
-	\addplot table[x=t, y=v] {velocidad-voltaje-8-s.csv};
-	\addplot table[x=t, y=v] {velocidad-voltaje-9-s.csv};
-	\addplot table[x=t, y=v] {velocidad-voltaje-10-s.csv};
+	\addplot table[x=t, y=v] {csv/velocidad-voltaje-4-s.csv};
+	\addplot table[x=t, y=v] {csv/velocidad-voltaje-5-s.csv};
+	\addplot table[x=t, y=v] {csv/velocidad-voltaje-6-s.csv};
+	\addplot table[x=t, y=v] {csv/velocidad-voltaje-7-s.csv};
+	\addplot table[x=t, y=v] {csv/velocidad-voltaje-8-s.csv};
+	\addplot table[x=t, y=v] {csv/velocidad-voltaje-9-s.csv};
+	\addplot table[x=t, y=v] {csv/velocidad-voltaje-10-s.csv};
 	\draw[black] (axis cs:0,0) -- (axis cs:0,40);
 	\draw[black] (axis cs:2,0) -- (axis cs:2,40);
 	\node[pin=-10:Arranque.] at (0,0) {};
@@ -1147,7 +1147,7 @@ aumenta la velocidad conforme se aumenta el ciclo de trabajo de la onda PWM.
 %	ymin = -0.15, ymax = 1,
 	ymin = -5,
 ]
-	\addplot table[x=p, y=v] {velocidad-voltaje2.csv};
+	\addplot table[x=p, y=v] {csv/velocidad-voltaje2.csv};
 	\addplot[black,domain=0.2:1, samples=10] {x*41.9103-8.4458};
 
 %	\addplot [red, domain=0.2:1.2, samples = 10, parametric] {\x/171*1000000}; %V_s para 18 º = 342.21
@@ -1180,7 +1180,7 @@ $$ f(x)=41.9103x - 8.4458$$
 %	xmin = -120.0, xmax = 0,
 %	ymin = 0, ymax = 60,
 ]
-	\addplot [blue] table[x=sx, y=sy] {180-cerrado.csv};
+	\addplot [blue] table[x=sx, y=sy] {csv/180-cerrado.csv};
 	\draw[red] (axis cs:-106,-3) circle[radius=4];
 
 %	\addplot [red, domain=0.2:1.2, samples = 10, parametric] {\x/171*1000000}; %V_s para 18 º = 342.21
