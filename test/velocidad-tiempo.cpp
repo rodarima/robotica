@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include <serialmouse.h>
-#include "odometry.h"
-#include "motion.h"
-#include "pinout.h"
+#include <odometry.h>
+#include <motion.h>
+#include <pinout.h>
 
 unsigned char _counter;
 
@@ -29,9 +29,9 @@ void print_json()
 	Serial.print(", \"ry\":");
 	Serial.print(robot.ry);
 	Serial.print(", \"theta\":");
-	Serial.print(robot.theta/(2*pi)*360);
+	Serial.print(robot.theta/(2*PI)*360);
 	Serial.print(", \"time\":");
-	Serial.print(micros());
+	Serial.print(robot.odometry_time);
 	Serial.print("}");
 	Serial.println("}");
 }
@@ -45,7 +45,17 @@ void print_csv()
 
 void loop()
 {
-	motion_update();
+	//motion_update();
+	if(robot.theta < PI)
+	{
+		motor_left(0.5);
+		motor_right(1);
+	}
+	else
+	{
+		motor_left(0);
+		motor_right(0);
+	}
 
 	if(_counter != robot.counter)
 	{

@@ -2,6 +2,7 @@
 #define _ODOMETRY_H_
 
 #define ROBOT_L	(97.5 - 0.25)
+//#define ROBOT_L	(97.5)
 #define MOUSEMM 11.484
 
 struct robot_t
@@ -14,6 +15,7 @@ struct robot_t
 	float theta_deg;	// 2 bytes for global angle (deg)
 	unsigned char counter;	// 1 byte for counter
 	int odometry_time;
+	double r;
 };
 
 

@@ -5,7 +5,6 @@
 #include "pinout.h"
 
 void odometry_init();
-static void _odometry_update();
 static void _mouse_update(unsigned char *buf);
 
 struct robot_t robot;
@@ -20,7 +19,32 @@ void odometry_init()
 	sm_init(_mouse_update);
 }
 
-void _odometry_update()
+static void odometry_update(struct robot_t *robot, float mx, float my)
+{
+	float r, sx, sy, alpha, phi;
+
+	alpha = mx / ROBOT_L;
+	phi = pi + alpha / 2.0;
+
+	if(mx == 0.0)
+	{
+		r = my;
+	}
+	else
+	{
+		r = 2.0 * ROBOT_L * my / mx * sin(mx / (2.0 * ROBOT_L))
+	}
+
+	vx = r * cos(robot.theta + phi);
+	vy = r * sin(robot.theta + phi);
+
+	robot.sx += vx;
+	robot.sy += vy;
+
+	robot.theta += alpha;
+}
+
+void _odometry_update_caca()
 {
 	float alpha = robot.vy / ROBOT_L;
 	float phi = alpha / 2.0;
@@ -93,7 +117,7 @@ void _mouse_update(unsigned char *buf)
 	robot.ry += _vy;
 
 	/* Calculate odometry */
-	_odometry_update();
+	update_odometry(&robot, _vy, _vx);
 
 	robot.counter++;
 
