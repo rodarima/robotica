@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 #include <serialmouse.h>
-#include "pinout.h"
+#include <pinout.h>
 
 void odometry_init();
 static void _mouse_update(unsigned char *buf);
@@ -11,10 +11,10 @@ struct robot_t robot;
 
 void odometry_init()
 {
-	pinMode(PINMR0,OUTPUT);
-	pinMode(PINMR1,OUTPUT);
-	pinMode(PINML0,OUTPUT);
-	pinMode(PINML1,OUTPUT);
+	pinMode(PIN_MTR0,OUTPUT);
+	pinMode(PIN_MTR1,OUTPUT);
+	pinMode(PIN_MTL0,OUTPUT);
+	pinMode(PIN_MTL1,OUTPUT);
 
 	sm_init(_mouse_update);
 	robot.sx = 0;
@@ -47,6 +47,10 @@ static void update_odometry(struct robot_t *robot, float mx, float my)
 	robot->sy += vy;
 
 	robot->theta += alpha;
+
+	//TODO: Angulo entre 0 y 2 PI ?
+	//while(robot->theta > 2.0*PI) robot->theta -= 2.0 * PI;
+	//while(robot->theta < 0) robot->theta += 2.0 * PI;
 }
 
 //void _odometry_update_caca()

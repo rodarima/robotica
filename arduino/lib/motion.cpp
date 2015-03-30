@@ -33,16 +33,6 @@ void motion_init()
 	target_theta = 0;
 }
 
-void motion_rotate(float theta)
-{
-	target_theta = theta;
-}
-
-void motion_rotate_delta(float theta_delta)
-{
-	target_theta+=theta_delta;
-}
-
 void motion_set_velocity(float v)
 {
 	velocity = v;
@@ -80,14 +70,20 @@ void _motor_set(unsigned char *m0, unsigned char *m1, float p)
 void motor_left(float p)
 {
 	_motor_set(&tml0, &tml1, p);
-	analogWrite(PINML0, tml0);
-	analogWrite(PINML1, tml1);
+	analogWrite(PIN_MTL0, tml0);
+	analogWrite(PIN_MTL1, tml1);
 }
 void motor_right(float p)
 {
 	_motor_set(&tmr0, &tmr1, p);
-	analogWrite(PINMR0, tmr0);
-	analogWrite(PINMR1, tmr1);
+	analogWrite(PIN_MTR0, tmr0);
+	analogWrite(PIN_MTR1, tmr1);
+}
+
+void motors(float r, float l)
+{
+	motor_right(r);
+	motor_left(l);
 }
 
 void _motion_distance()
@@ -107,4 +103,37 @@ void _motion_distance()
 void motion_update()
 {
 	_motion_distance();
+}
+
+void motion_rotate(float a)
+{
+	target_theta = a;
+}
+
+//#define THETA_MAX	5
+
+//float last_theta[THETA_MAX];
+
+void correct_theta(float k)
+{
+	if(k > 0.0)
+	{
+		motors(k, 0);
+	}
+	else if(k < 0.0)
+	{
+		motors(0, -k);
+	}
+}
+
+void rotation_update()
+{
+	if(robot.theta < target_theta)
+	{
+		motors(1, 0);
+	}
+	else if(robot.theta > target_theta)
+	{
+		motors(0, 1);
+	}
 }
