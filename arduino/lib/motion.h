@@ -12,6 +12,13 @@ void motion_set_velocity(float v);
 void motion_move(float d);
 
 void rotation_update();
+void rotate_cb(float a, float pmax, float pmin, void (*cb)(void));
+void motion_wait(long ms, void (*cb)(void));
+void motion_wait_update();
+
+
+void swing(float a, float delta, float pmin, float pmax, void (*cb)(void));
+
 
 #endif
 

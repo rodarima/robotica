@@ -9,6 +9,9 @@ unsigned char tmr0, tmr1, tml0, tml1;
 float target_theta;
 float velocity;
 float distance;
+void (*motion_wait_cb)(void) = NULL;
+void (*swing_cb)(void) = NULL;
+void (*rotation_cb)(void) = NULL;
 
 void motion_init();
 
@@ -31,6 +34,10 @@ void motion_init()
 	tml1 = 0;
 
 	target_theta = 0;
+
+	rotation_cb = NULL;
+	swing_cb = NULL;
+	motion_wait_cb = NULL;
 }
 
 void motion_set_velocity(float v)
@@ -80,8 +87,13 @@ void motor_right(float p)
 	analogWrite(PIN_MTR1, tmr1);
 }
 
-void motors(float r, float l)
+void motors(float l, float r)
 {
+	Serial.print("motors");
+	Serial.print(l);
+	Serial.print(r);
+	Serial.print("\n");
+
 	motor_right(r);
 	motor_left(l);
 }
@@ -105,35 +117,146 @@ void motion_update()
 	_motion_distance();
 }
 
-void motion_rotate(float a)
+#define R_CW	0	//Clockwise rotation
+#define R_CCW	1	//Counter clockwise rotation
+
+char rotation_dir;
+float rotation_target;
+
+void rotate_cb(float a, float pmin, float pmax, void (*cb)(void))
 {
-	target_theta = a;
+	rotation_target = a;
+	rotation_cb = cb;
+
+	Serial.print("rotate_cb angle:");
+	Serial.print(a);
+	Serial.print(" theta:");
+	Serial.print(robot.theta);
+	Serial.print(" pmax:");
+	Serial.print(pmax);
+	Serial.print(" pmin:");
+	Serial.print(pmin);
+	Serial.print("\n");
+
+	/* Turn motors */
+	if(robot.theta > a)
+	{
+		rotation_dir = R_CW;
+		motors(pmax, pmin);
+	}
+	else
+	{
+		rotation_dir = R_CCW;
+		motors(pmin, pmax);
+	}
+
 }
 
-//#define THETA_MAX	5
-
-//float last_theta[THETA_MAX];
-
-void correct_theta(float k)
+void print_rotation()
 {
-	if(k > 0.0)
-	{
-		motors(k, 0);
-	}
-	else if(k < 0.0)
-	{
-		motors(0, -k);
-	}
+	Serial.print(rotation_dir == R_CW ? "CW" : "CCW");
+	Serial.print(" th:");
+	Serial.print(robot.theta);
+	Serial.print(", target:");
+	Serial.print(rotation_target);
+	Serial.print("\n");
 }
 
 void rotation_update()
 {
-	if(robot.theta < target_theta)
+	//print_rotation();
+	void (*cb)(void) = rotation_cb;
+	if(!rotation_cb)
 	{
-		motors(1, 0);
+		Serial.print("rotation cb = NULL\n");
+		return;
 	}
-	else if(robot.theta > target_theta)
+
+	if(rotation_dir == R_CW)
 	{
-		motors(0, 1);
+		if(robot.theta < rotation_target)
+		{
+			rotation_cb = NULL;
+			cb();
+		}
+	}
+	else if(rotation_dir == R_CCW)
+	{
+		if(robot.theta > rotation_target)
+		{
+			rotation_cb = NULL;
+			cb();
+		}
+	}
+
+}
+
+float swing_min, swing_max, swing_pmin, swing_pmax;
+void _swing_min_cb();
+void _swing_max_cb();
+
+void print_swing()
+{
+	Serial.print("th:");
+	Serial.print(robot.theta);
+	Serial.print(", t+:");
+	Serial.print(swing_max);
+	Serial.print(", t-:");
+	Serial.print(swing_min);
+	Serial.print("\n");
+}
+
+void _swing_min_cb()
+{
+	Serial.print("swing min cb\n");
+	if(swing_cb) swing_cb();
+	print_swing();
+	rotate_cb(swing_max, swing_pmin, swing_pmax, _swing_max_cb);
+}
+void _swing_max_cb()
+{
+	Serial.print("swing max cb\n");
+	if(swing_cb) swing_cb();
+	print_swing();
+	rotate_cb(swing_min, swing_pmin, swing_pmax, _swing_min_cb);
+}
+
+void swing(float a, float delta, float pmin, float pmax, void (*cb)(void))
+{
+	swing_min = a - delta;
+	swing_max = a + delta;
+	swing_cb = cb;
+	swing_pmin = pmin;
+	swing_pmax = pmax;
+	Serial.print("Swing\n");
+	if(rotation_dir == R_CW)
+		rotate_cb(swing_min, swing_pmin, swing_pmax, _swing_min_cb);
+	else
+		rotate_cb(swing_max, swing_pmin, swing_pmax, _swing_max_cb);
+}
+
+long motion_wait_timeout = 0;
+
+void motion_wait(long ms, void (*cb)(void))
+{
+	motion_wait_timeout = millis() + ms;
+	motion_wait_cb = cb;
+}
+
+void motion_wait_update()
+{
+	if(!motion_wait_cb) return;
+
+	Serial.print("millis ");
+	Serial.print(millis());
+	Serial.print("timeout ");
+	Serial.print(motion_wait_timeout);
+	Serial.print("\n");
+
+	if(millis() > motion_wait_timeout)
+	{
+		void (*cb)(void) = motion_wait_cb;
+		motion_wait_cb = NULL;
+		cb();
 	}
 }

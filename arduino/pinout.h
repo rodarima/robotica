@@ -14,5 +14,8 @@
 /* Interrupción del eco */
 #define INT_SNR0	1
 
+#define PIN_LDR0	0
+#define PIN_LDR1	1
+
 
 #endif
