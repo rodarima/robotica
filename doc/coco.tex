@@ -51,6 +51,16 @@
 \usepackage{tikz}
 \usetikzlibrary{through,calc,arrows,angles,babel}
 
+% No separar mucho los párrafos
+%\setlength{\parskip}{0.5cm plus4mm minus3mm}
+
+%\usepackage{parskip}
+%\setlength{\parindent}{15pt}
+
+%\setlength{\parskip}{1cm plus4mm minus3mm}
+\usepackage{flushend}
+
+
 % Gráficas con pgf
 \usepackage{pgfplots}
 
@@ -342,7 +352,7 @@ coeficientes de la recta:
 \begin{center}
 \texttt{2.3864e+02   7.8846e-03}
 \end{center}
-Cuya recta (rojo) se puede observar en la figura~\ref{fig:sonar_plot}. Su 
+Cuya recta (azul) se puede observar en la figura~\ref{fig:sonar_plot}. Su 
 ecuación es:
 $$s = 238.64t + 7.8846\cdot10^{-3}$$
 
@@ -410,7 +420,7 @@ Obteniendo por regresión lineal, de la misma forma, los coeficientes:
 \begin{center}
 \texttt{1.7084e+02   1.0857e-02}
 \end{center}
-Y por tanto, la recta característica es:
+Y por tanto, la recta característica (negro) es:
 $$ s = 170.84 t + 1.0857\cdot 10^{-2} = 341.68\frac{t}{2} + 1.0857\cdot 10^{-2}
 $$
 
@@ -422,6 +432,9 @@ esta distancia es despreciable.
 Si comparamos la ecuación~\ref{eq:velocidad-sonido}, con el resultado 
 experimental, despreciando el desplazamiento de 1cm, se puede observar que son 
 muy similares.
+
+En la figura~\ref{fig:sonar_plot} la recta teórica en rojo, es muy similar a la
+recta experimental corregida, en negro.
 
 La velocidad del sonido calculada de forma experimental, resulta ser 341,68 m/s.  
 Este valor puede oscilar, ya que depende de la temperatura. Para calcular la 
@@ -436,7 +449,7 @@ real) es de unos 4mm.
 Es importante mencionar, que un ajuste del error, empleando un método de 
 regresión, permite solventar errores como el que ha sido detectado, pero no los 
 corrige. Por ello, se ha decidido que si los cálculos teóricos, no concuerdan 
-con los esperados, averiguar que ha causado el error.
+con los esperados, debe averiguarse que ha causado el error.
 \subsection{LDR}
 
 El sensor LDR permite obtener una medida de la cantidad de luz que incide sobre 
@@ -504,10 +517,11 @@ así como el ángulo.
 En cada medida, el sensor realiza 5000 mediciones de forma contínua, y luego 
 envía el valor de la media aritmética al ordenador, que es registrado.
 
-En la tabla, $s$ indica la distancia a la fuente de luz. Los ángulos indican la 
-orientación del robot:
+En la tabla~\ref{tab:ldr0}, $s$ indica la distancia a la fuente de luz. Los 
+ángulos indican la orientación del robot.
 
-\begin{center}
+\begin{table}[h]
+\centering
 \begin{tabular}{ | c | c | c | c | c | }
 \hline
 $s$(m) & $0º$ & $-90º$ & $+90º$ & $+180º$ \\ \hline
@@ -521,7 +535,8 @@ $s$(m) & $0º$ & $-90º$ & $+90º$ & $+180º$ \\ \hline
 1.60 & 396 & 340 & 407 & 440 \\ \hline
 1.80 & 378 & 296 & 383 & 405 \\ \hline
 \end{tabular}
-\end{center}
+\caption{Datos de calibración para \texttt{ldr0}.\label{tab:ldr0}}
+\end{table}
 
 En la figura~\ref{fig:ldr0}, se puede observar en una escala logarítmica para el 
 eje y, el valor del sensor para cada orientación.
@@ -565,9 +580,14 @@ la luz conforme a la orientación. Para calibrar este sensor se realizará un
 experimento similar, dividido en 4 orientaciones. Se asume que los valores para 
 los ángulos opuestos, dada la simetría, son iguales.
 
-Se muestran en la siguiente tabla los resultados obtenidos:
+Se muestran en la tabla~\ref{tab:ldr1} los resultados obtenidos. Finalmente, en 
+la figura~\ref{fig:ldr1}, se muestran también en una escala logarítmica para el 
+valor del sensor.
 
-\begin{center}
+\vfill
+
+\begin{table}[h]
+\centering
 \begin{tabular}{ | c | c | c | c | c | }
 \hline
 $s$(m) & $0º$ & $30º$ & $60º$ & $90º$ \\ \hline
@@ -584,12 +604,10 @@ $s$(m) & $0º$ & $30º$ & $60º$ & $90º$ \\ \hline
 1.20 & 977 & 277 & 96 & 60 \\ \hline
 1.40 & 968 & 173 & 65 & 57 \\ \hline
 \end{tabular}
-\end{center}
+\caption{Datos de calibración de \texttt{ldr1}.\label{tab:ldr1}}
+\end{table}
 
-Finalmente, en la figura~\ref{fig:ldr1}, se muestran también en una escala 
-logarítmica para el valor del sensor.
-
-\begin{figure}[h]
+\begin{figure}[H]
 \centering
 \begin{tikzpicture}
 \begin{semilogyaxis}[grid=both,
@@ -613,6 +631,8 @@ logarítmica para el valor del sensor.
 \end{tikzpicture}
 \caption{Resultados de calibración para \texttt{ldr1}.\label{fig:ldr1}}
 \end{figure}
+
+\clearpage
 \subsection{\texttt{mouse0}: Ratón de bola}
 
 En la parte posterior, un ratón de bola permite obtener mediciones del movimiento del
@@ -638,7 +658,7 @@ Para ello, es necesario averiguar el funcionamiento del ratón. Este consta de
 una bola de goma, que está situada en un zócalo, donde puede girar libremente, 
 al mover el ratón por una superficie.
 
-Dos rodillos de plástico rozan con la bola, situados en un ángulo de $90º$. A 
+Dos rodillos de plástico rozan con la bola, desfasados en un ángulo de $90º$. A 
 continuación se analiza, como el movimiento de la bola, roza en los puntos $B_1$ 
 y $B_2$ con los rodillos del ratón. En la figura~\ref{fig:bola} se observa con 
 detalle el mismo giro que en la figura~\ref{fig:giro}.
@@ -1195,7 +1215,7 @@ inercia de los motores.\label{fig:giro-180}}
 
 
 
-\section{Posibles errores}
+\section{Errores en las bibliotecas de Arduino.}
 
 La función \texttt{attachInterrupt} no borra las banderas (flags) \texttt{INTF0} 
 y \texttt{INTF1} del registro \texttt{EIFR}, de forma que al colocar una 
@@ -1205,17 +1225,22 @@ de la función:
 
 \texttt{EIFR |= \_BV(INTF0) || \_BV(INTF1);}
 
-La función \texttt{pulseIn} calcula el tiempo dependiendo de las optimizaciones
-que se produzcan. Es necesario que sea independiente. Además es conveniente
-sustituirla por alguna función no bloqueante que emplee interrupciones.
-\section{TODO}
-Este documento está incompleto. Faltan cálculos en la parte de la odometría, así 
-como los experimentos que verifican la posición de robot.
+La función \texttt{pulseIn} calcula el tiempo transcurrido dependiendo del 
+número de instrucciones que contiene un bucle. Este número puede variar con las 
+optimizaciones que se realicen. Debe ser invariante.
 
-Falta cambiar los gráficos a pgf. Corregir la ortografía. Usar la precisión en 
-los experimentos. Encontrar la ecuación que describe la luz con la distancia, en 
-el LDR. Y las ecuaciones que describen el movimiento de los motores, sabiendo el 
-voltaje y tiempo de funcionamiento.
+Además es conveniente sustituirla por alguna función no bloqueante que emplee 
+interrupciones.
 
-La última versión se encuentra en \url{https://github.com/rodarima/robotica}.
+\section{Trabajo futuro}
+Existen algunos temas que no se han podido tratar, por falta de tiempo. Son las 
+ecuaciones que describen el comportamiento de la luz, cuando se varía la 
+distancia a la fuente, o cuando se varía el ángulo del sensor.
+
+Las ecuaciones del arranque del motor, se han ignorado, pero analizarlas podría 
+mejorar los cálculos de odometría.
+
+La última versión de este documento se encuentra en 
+\url{https://github.com/rodarima/robotica}.
+\clearpage
 \end{document}
