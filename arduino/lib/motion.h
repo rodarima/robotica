@@ -1,24 +1,32 @@
 #ifndef _MOTION_H_
 #define _MOTION_H_
 
-void motion_init();
-void motion_rotate(float theta);
-void motor_right(float p);
-void motor_left(float p);
-void motors(float r, float l);
-void motion_rotate_delta(float theta_delta);
-void motion_update();
-void motion_set_velocity(float v);
-void motion_move(float d);
 
-void rotation_update();
-void rotate_cb(float a, float pmax, float pmin, void (*cb)(void));
+/* Manipular el voltaje de los motores */
+void motors(float r, float l);
+
+/* Giros */
+void motion_rotate(float a, float pmin, float pmax, void (*cb)(void));
+void motion_rotation_update();
+
+/* Balanceo */
+void swing(float a, float delta, float pmin, float pmax, void (*cb)(void));
+/* No tiene update */
+
+/* Esperas */
 void motion_wait(long ms, void (*cb)(void));
 void motion_wait_update();
 
+/* Detención */
+void motion_stop(void (*cb)(void));
+void motion_stop_update();
 
-void swing(float a, float delta, float pmin, float pmax, void (*cb)(void));
+/* Avanzar en línea recta */
+void motion_straight(double distance, void (*cb)(void));
+void motion_straight_update();
 
+/* Actualizar todas las funciones (callback) */
+void motion_update();
 
 #endif
 

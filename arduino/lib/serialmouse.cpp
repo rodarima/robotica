@@ -116,7 +116,7 @@ void sm_init(void (*f)(unsigned char *))
 	bytepos = 0;
 	mouse_func = f;
 
-	//pinMode(13, OUTPUT);
+	pinMode(13, OUTPUT);
 	pinMode(PINMOUSE, INPUT);
 	attachInterrupt(PININT, sm_interrupt, RISING);
 }

@@ -77,7 +77,7 @@ void set_behavior_go_ahead()
 
 void update_behavior_go_ahead()
 {
-	Serial.print("Updating sonar\n");
+//	Serial.print("Updating sonar\n");
 	sonar_update(&snr0);
 }
 
@@ -247,14 +247,12 @@ void select_behavior()
 	}
 
 
-	Serial.print("Behavior:");
-	Serial.print((int)behavior);
-	Serial.print("\n");
-
 }
 
 void update_behavior()
 {
+	char _prev_behavior = behavior;
+
 	switch(behavior)
 	{
 		case GO_AHEAD:	update_behavior_go_ahead();
@@ -264,6 +262,21 @@ void update_behavior()
 	}
 
 	select_behavior();
+
+	if(_prev_behavior != behavior)
+	{
+		char *s = "UNKNOWN";
+		switch(behavior)
+		{
+			case GO_AHEAD:	s = "GO_AHEAD";
+			case BACK:	s = "GO_BACK";
+			case RANDOM:	s = "RANDOM";
+			case LIGHT:	s = "FOLLOW_LIGHT";
+		}
+		Serial.print("Now behavior is ");
+		Serial.print(s);
+		Serial.print("\n");
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -285,7 +298,7 @@ void loop()
 	update_behavior();
 	rotation_update();
 
-	print_theta();
+	//print_theta();
 	//print_json();
 	print_light();
 	//

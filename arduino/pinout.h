@@ -17,5 +17,9 @@
 #define PIN_LDR0	0
 #define PIN_LDR1	1
 
+/* Antenas */
+#define PIN_ANTL	7
+#define PIN_ANTR	8
+
 
 #endif

@@ -17,8 +17,10 @@ void odometry_init()
 	pinMode(PIN_MTL1,OUTPUT);
 
 	sm_init(_mouse_update);
-	robot.sx = 0;
-	robot.sy = 0;
+	robot.mx = 0;
+	robot.my = 0;
+	robot.rx = 0;
+	robot.ry = 0;
 	robot.theta = 0;
 	robot.r = 0;
 }
@@ -26,8 +28,10 @@ void odometry_init()
 static void update_odometry(struct robot_t *robot, float mx, float my)
 {
 	float r, vx, vy, alpha, phi;
+	// Pequeña corrección para ajustar la dirección del mouse
+	float epsilon = robot->vy >= 0 ? 0.0001 : -0.0001;
 
-	alpha = mx / ROBOT_L;
+	alpha = mx / ROBOT_L + epsilon;
 	phi = (PI + alpha) / 2.0;
 
 	if(mx == 0.0)
@@ -43,8 +47,11 @@ static void update_odometry(struct robot_t *robot, float mx, float my)
 	vx = r * cos(robot->theta + phi);
 	vy = r * sin(robot->theta + phi);
 
-	robot->sx += vx;
-	robot->sy += vy;
+	robot->vx = vx;
+	robot->vy = vy;
+
+	robot->rx += vx;
+	robot->ry += vy;
 
 	robot->theta += alpha;
 
@@ -105,8 +112,8 @@ void _mouse_update(unsigned char *buf)
 	mx = (float) v / MOUSEMM;
 	my = (float) h / MOUSEMM;
 
-	robot.rx += mx;
-	robot.ry += my;
+	robot.mx += mx;
+	robot.my += my;
 
 	/* Calculate odometry */
 	update_odometry(&robot, mx, my);
@@ -114,12 +121,13 @@ void _mouse_update(unsigned char *buf)
 	robot.counter++;
 
 	robot.odometry_time = micros() - t;
+//	Serial.print("U");
 
 	if(robot.odometry_time > 1000)
 	{
 		digitalWrite(13, 1);
-		Serial.print("TIME UP ");
-		Serial.println(robot.odometry_time);
+//		Serial.print("TIME UP ");
+//		Serial.println(robot.odometry_time);
 	}
 
 }
