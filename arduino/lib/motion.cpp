@@ -139,7 +139,7 @@ void print_rotation()
 
 void motion_rotation_update()
 {
-	print_rotation();
+//	print_rotation();
 	void (*cb)(void) = rotation_cb;
 	if(!rotation_cb)
 	{
@@ -259,16 +259,37 @@ void motion_stop_update()
 }
 
 double straight_end;
-char straight_dir;
+char straight_dir, straight_forever;
 char straight_counter;
+float straight_start_x, straight_start_y, straight_distance, straight_angle;
+float straight_end_x, straight_end_y;
 
 #define FORWARD		1
 #define BACKWARD	-1
 
-void motion_straight(double distance, void (*cb)(void))
+#define ERR_MAX	10
+#define Kp 0.05 //200.0
+#define KA -200
+#define KX 2
+
+void motion_straight_nothing() {}
+
+void motion_straight(double distance, char forever, void (*cb)(void))
 {
+	if(distance == 0) return;
+
 	straight_cb = cb;
-	straight_end = robot.r + fabs(distance);
+	straight_start_x = robot.rx;
+	straight_start_y = robot.ry;
+	straight_forever = forever;
+
+	if(forever) straight_cb = motion_straight_nothing;
+
+	straight_distance = fabs(distance);
+	straight_angle = robot.theta;
+	straight_end_x = robot.rx + distance * cos(robot.theta);
+	straight_end_y = robot.ry + distance * sin(robot.theta);
+	
 	straight_dir = distance > 0 ? FORWARD : BACKWARD;
 	straight_counter = robot.counter;
 
@@ -282,18 +303,95 @@ void motion_straight(double distance, void (*cb)(void))
 	}
 }
 
+float straight_error()
+{
+	int i;
+	
+	float prop, err_s, err_a, s, alpha, beta;
+
+	s = pow(robot.rx - 100, 2);
+	s += pow(robot.ry - 100, 2);
+	s = sqrt(s);
+
+	beta = asin((robot.rx - 100) / s);
+	alpha = beta - robot.theta;
+
+	err_s = - s * sin(alpha);
+	err_a = straight_dir * (straight_angle - robot.theta);
+
+	prop = Kp * (0*KX * err_s + KA * err_a);
+
+	//TODO: Usar la variación en x para la correción, eliminando el
+	//error acumulado.
+
+/*
+	Serial.print("s:");
+	Serial.print(s);
+	Serial.print("\terr_s:");
+	Serial.print(err_s*KX);
+	Serial.print("\terr_a:");
+	Serial.print(err_a*KA);
+	Serial.print("\tprop:");
+	Serial.print(prop);
+	Serial.print("\tbeta:");
+	Serial.print(beta/(2*PI)*360);
+	Serial.print("\n");
+*/
+/*
+	fw_error[fw_error_i] = fw_pro;
+	fw_error_i = (fw_error_i + 1) % ERR_MAX;
+	fw_int = 0;
+
+	for(i = 0; i < ERR_MAX; i++)
+	{
+		fw_int += fw_error[i];
+	}
+
+	ci = fw_int * Ki;
+	cp = fw_pro * Kp;
+	c = ci + cp;
+*/
+
+	return prop;
+}
 
 void motion_straight_update()
 {
 	if(robot.counter == straight_counter) return;
-
+/*
 	Serial.print("\tr:");
 	Serial.print(robot.r);
 	Serial.print(" end:");
 	Serial.print(straight_end);
-	if(robot.r > straight_end)
+*/
+	float s, c;
+	s = pow(robot.rx - straight_start_x, 2);
+	s += pow(robot.ry - straight_start_y, 2);
+	s = sqrt(s);
+	if(s > straight_distance && !straight_forever)
 	{
 		callback(&straight_cb);
+		return;
+	}
+
+	c = straight_error();
+
+	if(c > 1) c = 1;
+	if(c < -1) c = -1;
+
+	if(straight_dir == FORWARD)
+	{
+		if(c > 0)
+			motors(1, 1-c);
+		else if(c < 0)
+			motors(1+c, 1);
+	}
+	else
+	{
+		if(c > 0)
+			motors(-1, -1+c);
+		else if(c < 0)
+			motors(-1-c, -1);
 	}
 
 	straight_counter = robot.counter;

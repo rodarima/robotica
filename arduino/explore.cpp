@@ -26,7 +26,15 @@ float fw_start[2];
 #define RIGHT	1
 #define INV(x) (1-(x))
 
+#define TASK_GO			0
+#define TASK_FOLLOW_WALL	1
+#define TASK_STUCK		2
+#define TASK_LIGHT		3
+#define TASK_EVADE_WALL		4
+
 char ant_status[2];
+int ldr0, ldr1, ldr0_max = 800;
+volatile int snr0;
 
 float fw_error[ERR_MAX];
 int fw_error_i;
@@ -43,6 +51,7 @@ struct task_t
 	void (*f_update)(void);
 	int prio;
 	char state;
+	char id;
 };
 
 #define MAX_TASKS	10
@@ -57,10 +66,36 @@ char task_add(struct task_t *t)
 	tasks[tasks_i].f_trigger = t->f_trigger;
 	tasks[tasks_i].f_update = t->f_update;
 	tasks[tasks_i].prio = t->prio;
+	tasks[tasks_i].state = t->state;
+	tasks[tasks_i].id = t->id;
 
 	tasks_i++;
 }
 
+void task_stop(char id)
+{
+	int i;
+
+	for(i = 0; i <= tasks_i; i++)
+	{
+		if(tasks[i].id == id)
+		{
+			tasks[i].state = 0;
+		}
+	}
+}
+
+void task_reset()
+{
+	int i;
+
+	for(i = 0; i <= tasks_i; i++)
+	{
+		tasks[i].state = 0;
+	}
+}
+
+int last_task = -1;
 void task_update()
 {
 	int i, j = 0, max_prio = 0;
@@ -77,7 +112,7 @@ void task_update()
 		}
 	}
 
-	if(!tasks[j].state)
+	if(!tasks[j].state && tasks[j].f_start)
 	{
 		Serial.print("New task triggered ");
 		Serial.print(j);
@@ -86,7 +121,19 @@ void task_update()
 	}
 	else
 	{
-		tasks[j].f_update();
+		if(!tasks[j].state)
+		{
+			Serial.print("New task triggered ");
+			Serial.print(j);
+			tasks[j].state = 1;
+		}
+		if(tasks[j].f_update) tasks[j].f_update();
+	}
+	if(last_task != j)
+	{
+		last_task = j;
+		Serial.print("Task ");
+		Serial.print(j);
 	}
 }
 
@@ -104,38 +151,94 @@ char wall_side;
 #define ANG_LEFT	PI/2.0 * 0.9
 #define ANG_RIGHT	-ANG_LEFT
 
-#define WALL_CENTER	0
-#define WALL_APPROACH	1
-#define WALL_FOLLOW	2
-#define WALL_DISTANCE	75
+#define WALL_INIT	0
+#define WALL_CENTER	1
+#define WALL_APPROACH	2
+#define WALL_FOLLOW	3
+#define WALL_FLYING	4
 
-char follow_wall_state = 0;
+#define WALL_DISTANCE	75
+#define MAX_FREE_WALL	200
+
+char follow_wall_state = WALL_INIT;
+
+/* Recorrido desde el último choque con la pared */
+float free_wall_r = 0;
+
+void check_free_wall()
+{
+	if(robot.r - free_wall_r < MAX_FREE_WALL) return;
+
+	Serial.print("Free wall.");
+	
+	// Girar hacia la pared
+	if(wall_side == LEFT)
+	{
+		motors(0.5, 1);
+	}
+	else
+	{
+		motors(1, 0.5);
+	}
+
+	// Dejar de seguir la pared ?
+	follow_wall_state = WALL_FLYING;
+}
+
+void wall_flying_update()
+{
+	if(ant_status[LEFT] || ant_status[RIGHT])
+	{
+		follow_wall_state = WALL_CENTER;
+	}
+}
+
+#define MIN_SNR0	500
 
 void wall_follow_update()
 {
 	//TODO: Cuando se reestablece el estado?
-	follow_wall_state = WALL_FOLLOW;
+	if(follow_wall_state != WALL_FOLLOW)
+	{
+		follow_wall_state = WALL_FOLLOW;
+		free_wall_r = robot.r;
+	}
+
+	if(snr0 < MIN_SNR0 && snr0 > 0)
+	{
+		Serial.print("sonar alert:");
+		Serial.print(snr0);
+		Serial.print(".");
+		follow_wall_state = WALL_CENTER;
+		return;
+	}
 
 	if(wall_side == LEFT)
 	{
 		if(ant_status[wall_side])
 		{
-			motors(1, 0.5);
+			//motors(1, -0.5);
+			motors(-0.3, -1);
+			free_wall_r = robot.r;
 		}
 		else
 		{
 			motors(0.8, 1);
+			check_free_wall();
 		}
 	}
 	else
 	{
 		if(ant_status[wall_side])
 		{
-			motors(0.5, 1);
+			//motors(-0.5, 1);
+			motors(-1, -0.3);
+			free_wall_r = robot.r;
 		}
 		else
 		{
 			motors(1, 0.8);
+			check_free_wall();
 		}
 	}
 }
@@ -149,7 +252,7 @@ void wall_approach_rotate()
 void wall_approach_back()
 {
 	Serial.print("WB.");
-	motion_straight(-WALL_DISTANCE, wall_approach_rotate);
+	motion_straight(-WALL_DISTANCE, 0, wall_approach_rotate);
 	//Actualizar motion straight
 }
 
@@ -190,8 +293,8 @@ void set_forward()
 {
 	int i;
 	dir = 1;
-	motors(0, 0);
-	delay(1000);
+//	motors(0, 0);
+//	delay(1000);
 	motors(M*1, M*1);
 	fw_angle = 0;
 	fw_x = 0;
@@ -320,9 +423,20 @@ void update_ants()
 	ant_status[RIGHT] = digitalRead(PIN_ANTR);
 }
 
+void update_snr()
+{
+	sonar_update(&snr0);
+}
+
+void update_ldr()
+{
+	ldr0 = analogRead(PIN_LDR0);
+	ldr1 = analogRead(PIN_LDR1);
+}
+
 void task_go_forward()
 {
-	set_forward();
+	motion_straight(1, 1, NULL);
 }
 
 void task_follow_wall()
@@ -355,6 +469,10 @@ void task_follow_wall_update()
 	{
 		wall_approach_center();
 	}
+	else if(follow_wall_state == WALL_FLYING)
+	{
+		wall_flying_update();
+	}
 }
 
 void task_stuck()
@@ -379,11 +497,131 @@ void task_stuck()
 }
 char task_stuck_trigger()
 {
-	task_stuck();
+	//task_stuck();
 	return 0;
 }
 
+#define LIGHT_ANGLE	(45.0/360.0 * 2.0*PI)
 
+#define LIGHT_INIT	0
+#define LIGHT_STOP	1
+#define LIGHT_360	2
+#define LIGHT_360_MAX	3
+#define LIGHT_GO	4
+#define LIGHT_SWING_L	5
+#define LIGHT_SWING_R	6
+#define LIGHT_SWING_MAX	7
+#define LIGHT_BLOCKED	10
+
+int light_max;
+float light_angle;
+
+char light_state = LIGHT_INIT;
+
+void light_end_360();
+void light_end_centering();
+void light_end_straight();
+void light_end_swing_l();
+void light_end_swing_r();
+
+void light_end_360()
+{
+	light_state = LIGHT_360_MAX;
+	if(light_angle < robot.theta - PI) light_angle += 2.0*PI;
+	motion_rotate(light_angle, -1, 1, light_end_centering);
+}
+
+void light_end_centering()
+{
+	Serial.print("ldr0_max:");
+	Serial.print(light_max);
+	Serial.print(".");
+	light_state = LIGHT_GO;
+	motion_straight(100, 0, light_end_straight);
+}
+
+void light_end_straight()
+{
+	light_state = LIGHT_SWING_L;
+	light_max = ldr1;
+	light_angle = robot.theta;
+	motion_rotate(robot.theta + LIGHT_ANGLE / 2.0, -1, 1, light_end_swing_l);
+}
+
+void light_end_swing_l()
+{
+	light_state = LIGHT_SWING_R;
+	motion_rotate(robot.theta - LIGHT_ANGLE, -1, 1, light_end_swing_r);
+}
+
+void light_end_swing_r()
+{
+	light_state = LIGHT_SWING_MAX;
+	motion_rotate(light_angle, -1, 1, light_end_centering);
+}
+
+void task_light_update()
+{
+	if(light_state == LIGHT_BLOCKED) return;
+
+	if(light_state == LIGHT_INIT)
+	{
+		light_max = ldr1;
+		light_angle = robot.theta;
+		light_state = LIGHT_360;
+		motion_rotate(robot.theta + 2*PI, -1, 1, light_end_360);
+	}
+	else if(light_state == LIGHT_360 || light_state == LIGHT_SWING_R)
+	{
+		if(light_max < ldr1)
+		{
+			light_max = ldr1;
+			light_angle = robot.theta;
+		}
+	}
+}
+
+char task_light_trigger()
+{
+	if(follow_wall_state != WALL_INIT) return 0;
+	if(ldr0 > ldr0_max)
+	{
+		return 1;
+	}
+	return 0;
+}
+
+void unblock_follow_light()
+{
+	light_state = LIGHT_INIT;
+	motors(0, 0);
+	task_stop(TASK_EVADE_WALL);
+}
+
+char task_evade_wall_trigger()
+{
+	if(ldr0 <= ldr0_max) return 0;
+
+	if(follow_wall_state != WALL_FOLLOW) return 0;
+
+	/* Separarse de la pared */
+	task_stop(TASK_FOLLOW_WALL);
+	task_stop(TASK_LIGHT);
+	task_stop(TASK_STUCK);
+	task_stop(TASK_GO);
+	follow_wall_state = WALL_INIT;
+
+	if(wall_side == LEFT)
+	{
+		motion_rotate(robot.theta - PI/2.0, 0, 1, unblock_follow_light);	
+	}
+	else
+	{
+		motion_rotate(robot.theta + PI/2.0, 0, 1, unblock_follow_light);
+	}
+
+	return 1;
+}
 
 void set_tasks()
 {
@@ -392,9 +630,10 @@ void set_tasks()
 	/* Comenzar avanzando hacia delante */
 	t.f_start = task_go_forward;
 	t.f_trigger = NULL;
-	t.f_update = update_forward;
+	t.f_update = NULL;
 	t.prio = 1;
-	t.state = 1;
+	t.state = 0;
+	t.id = TASK_GO;
 	task_add(&t);
 
 	t.f_start = task_follow_wall;
@@ -402,6 +641,7 @@ void set_tasks()
 	t.f_update = task_follow_wall_update;
 	t.prio = 2;
 	t.state = 0;
+	t.id = TASK_FOLLOW_WALL;
 	task_add(&t);
 
 	t.f_start = task_stuck;
@@ -409,6 +649,23 @@ void set_tasks()
 	t.f_update = task_stuck;
 	t.prio = 10;
 	t.state = 0;
+	t.id = TASK_STUCK;
+	task_add(&t);
+
+	t.f_start = NULL;
+	t.f_trigger = task_light_trigger;
+	t.f_update = task_light_update;
+	t.prio = 3;
+	t.state = 0;
+	t.id = TASK_LIGHT;
+	task_add(&t);
+
+	t.f_start = NULL;
+	t.f_trigger = task_evade_wall_trigger;
+	t.f_update = NULL;
+	t.prio = 4;
+	t.state = 0;
+	t.id = TASK_EVADE_WALL;
 	task_add(&t);
 }
 
@@ -424,10 +681,35 @@ void setup()
 	Serial.print("########### Starting arduino ###########\n");
 
 	odometry_init();
-//	sonar_init();
+	sonar_init();
+
+
+	do
+	{
+		update_ants();
+		update_ldr();
+		ldr0_max = ldr0;
+	}
+	while(!ant_status[LEFT]);
+
+	Serial.print("ldr0_max:");
+	Serial.print(ldr0_max);
+
+	do
+	{
+		update_ants();
+	}
+	while(!ant_status[RIGHT]);
+
+	delay(50);
+	do
+	{
+		update_ants();
+	}
+	while(ant_status[RIGHT]);
 
 	set_tasks();
-	task_go_forward();
+	//task_go_forward();
 }
 
 void loop()
@@ -460,6 +742,8 @@ void loop()
 */
 
 	update_ants();
+	update_snr();
+	update_ldr();
 	motion_update();
 
 	task_update();

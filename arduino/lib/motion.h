@@ -21,8 +21,8 @@ void motion_wait_update();
 void motion_stop(void (*cb)(void));
 void motion_stop_update();
 
-/* Avanzar en línea recta */
-void motion_straight(double distance, void (*cb)(void));
+/* Avanzar en línea recta con corrección de rumbo */
+void motion_straight(double distance, char forever, void (*cb)(void));
 void motion_straight_update();
 
 /* Actualizar todas las funciones (callback) */

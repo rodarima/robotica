@@ -3,11 +3,14 @@
 #include <Arduino.h>
 #include <pinout.h>
 
+#define MAX_MED	3
+
 /* Sonar library */
 
 unsigned long sonar_last_t;
 unsigned long sonar_start_t;
 volatile int sonar_inc_t;
+int sonar_med[MAX_MED];
 
 void sonar_pulse();
 void sonar_pulse_start();
@@ -44,6 +47,16 @@ void sonar_init()
 
 	sonar_inc_t = -1;
 	sonar_pulse();
+}
+
+void sonar_update_med(int val)
+{
+	int i;
+	for(i = 0; i<MAX_MED-1; i++)
+	{
+		sonar_med[i] = sonar_med[i+1];
+	}
+	sonar_med[MAX_MED-1] = val;
 }
 
 void sonar_update(volatile int *snr)
