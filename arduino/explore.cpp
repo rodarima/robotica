@@ -31,9 +31,10 @@ float fw_start[2];
 #define TASK_STUCK		2
 #define TASK_LIGHT		3
 #define TASK_EVADE_WALL		4
+#define TASK_LDR		5
 
 char ant_status[2];
-int ldr0, ldr1, ldr0_max = 800;
+int ldr0, ldr1, ldr0_max = 800, ldr0_stop = 860;
 volatile int snr0;
 
 float fw_error[ERR_MAX];
@@ -112,7 +113,7 @@ void task_update()
 		}
 	}
 
-	if(!tasks[j].state && tasks[j].f_start)
+	if((!tasks[j].state) && (tasks[j].f_start))
 	{
 		Serial.print("New task triggered ");
 		Serial.print(j);
@@ -148,7 +149,7 @@ void set_follow_left()
 
 char wall_side;
 
-#define ANG_LEFT	PI/2.0 * 0.9
+#define ANG_LEFT	PI/2.0 * 1
 #define ANG_RIGHT	-ANG_LEFT
 
 #define WALL_INIT	0
@@ -160,10 +161,16 @@ char wall_side;
 #define WALL_DISTANCE	75
 #define MAX_FREE_WALL	200
 
+/* Tiempo siguiendo una pared en ms */
+#define MAX_FOLLOW_WALL	6000
+
 char follow_wall_state = WALL_INIT;
 
 /* Recorrido desde el último choque con la pared */
 float free_wall_r = 0;
+
+/* Recorrido durante la pared */
+unsigned long follow_wall_t = 0;
 
 void check_free_wall()
 {
@@ -185,6 +192,26 @@ void check_free_wall()
 	follow_wall_state = WALL_FLYING;
 }
 
+void check_follow_wall()
+{
+	if(millis() < follow_wall_t) return;
+
+	Serial.print("Too long wall. STUCK? micros() = ");
+	Serial.print(millis());
+	Serial.print(", follow timeout = ");
+	Serial.print(follow_wall_t);
+	Serial.print(".");
+	
+	follow_wall_state = WALL_CENTER;
+}
+
+void check_corner()
+{
+	Serial.print("Corner detected.");
+	
+	follow_wall_state = WALL_CENTER;
+}
+
 void wall_flying_update()
 {
 	if(ant_status[LEFT] || ant_status[RIGHT])
@@ -193,7 +220,8 @@ void wall_flying_update()
 	}
 }
 
-#define MIN_SNR0	500
+#define MIN_SNR0	250
+/* La bombilla cerca con ldr0 = 860 */
 
 void wall_follow_update()
 {
@@ -202,9 +230,10 @@ void wall_follow_update()
 	{
 		follow_wall_state = WALL_FOLLOW;
 		free_wall_r = robot.r;
+		follow_wall_t = millis() + MAX_FOLLOW_WALL;
 	}
-
-	if(snr0 < MIN_SNR0 && snr0 > 0)
+/*
+	if((snr0 < MIN_SNR0) && (snr0 > 0))
 	{
 		Serial.print("sonar alert:");
 		Serial.print(snr0);
@@ -212,34 +241,45 @@ void wall_follow_update()
 		follow_wall_state = WALL_CENTER;
 		return;
 	}
-
+*/
 	if(wall_side == LEFT)
 	{
 		if(ant_status[wall_side])
 		{
-			//motors(1, -0.5);
-			motors(-0.3, -1);
+			motors(1, -0.5);
+			//motors(-0.3, -1);
+			check_follow_wall();
 			free_wall_r = robot.r;
 		}
 		else
 		{
 			motors(0.8, 1);
 			check_free_wall();
+			follow_wall_t = millis() + MAX_FOLLOW_WALL;
 		}
 	}
 	else
 	{
 		if(ant_status[wall_side])
 		{
-			//motors(-0.5, 1);
-			motors(-1, -0.3);
+			motors(-0.5, 1);
+			//motors(-1, -0.3);
+			check_follow_wall();
 			free_wall_r = robot.r;
 		}
 		else
 		{
 			motors(1, 0.8);
 			check_free_wall();
+			follow_wall_t = millis() + MAX_FOLLOW_WALL;
 		}
+	}
+
+	// Esquina
+	if(ant_status[INV(wall_side)])
+	{
+		follow_wall_state = WALL_CENTER;
+		return;
 	}
 }
 void wall_approach_rotate()
@@ -256,11 +296,38 @@ void wall_approach_back()
 	//Actualizar motion straight
 }
 
+#define CENTERING_TIMEOUT	5000
+
+unsigned long centering_timeout;
+
+void check_centering_timeout()
+{
+	if(millis() < centering_timeout) return;
+
+	// Evitar la esquina
+
+	if(wall_side == LEFT)
+	{
+		motors(-1, 1);
+	}
+	else
+	{
+		motors(1, -1);
+	}
+
+}
+
 void wall_approach_center()
 {
-	follow_wall_state = WALL_CENTER;
+	if(follow_wall_state != WALL_CENTER)
+	{
+		follow_wall_state = WALL_CENTER;
+		centering_timeout = millis() + CENTERING_TIMEOUT;
+	}
+
 	if(ant_status[wall_side])
 	{
+		centering_timeout = millis() + CENTERING_TIMEOUT;
 		if(wall_side == LEFT)
 		{
 			motors(-1, 0);
@@ -285,6 +352,7 @@ void wall_approach_center()
 		{
 			motors(1, 0.5);
 		}
+		check_centering_timeout();
 	}
 }
 
@@ -479,7 +547,7 @@ void task_stuck()
 {
 	float v = sqrt(pow(robot.vx, 2) + pow(robot.vy, 2));
 	if(v > robot.vmax) robot.vmax = v;
-	if(robot.mr != 0 && robot.ml != 0)
+	if((robot.mr != 0) && (robot.ml != 0))
 	{
 		if(v < 0.1 * robot.vmax)
 		{
@@ -498,6 +566,9 @@ void task_stuck()
 char task_stuck_trigger()
 {
 	//task_stuck();
+	//if(follow_wall_state != WALL_FLYING) return 0;
+
+	//if(snr0 > 0 && snr0 < MIN_SNR0) return 1;
 	return 0;
 }
 
@@ -583,10 +654,18 @@ void task_light_update()
 
 char task_light_trigger()
 {
-	if(follow_wall_state != WALL_INIT) return 0;
+	if(follow_wall_state != WALL_INIT)
+	{
+		if(follow_wall_state != WALL_FLYING) return 0;
+	}
 	if(ldr0 > ldr0_max)
 	{
+		Serial.print("Light detected, ldr0:");
+		Serial.print(ldr0);
+		Serial.print(".");
 		return 1;
+		follow_wall_state = WALL_INIT;
+		task_stop(TASK_FOLLOW_WALL);
 	}
 	return 0;
 }
@@ -604,12 +683,14 @@ char task_evade_wall_trigger()
 
 	if(follow_wall_state != WALL_FOLLOW) return 0;
 
+	Serial.print("Evading wall.");
 	/* Separarse de la pared */
 	task_stop(TASK_FOLLOW_WALL);
 	task_stop(TASK_LIGHT);
 	task_stop(TASK_STUCK);
 	task_stop(TASK_GO);
 	follow_wall_state = WALL_INIT;
+	light_state = LIGHT_INIT;
 
 	if(wall_side == LEFT)
 	{
@@ -621,6 +702,36 @@ char task_evade_wall_trigger()
 	}
 
 	return 1;
+}
+
+#define SNR0_MIN_STOP	250
+
+char task_ldr_trigger()
+{
+	if(ldr0 > ldr0_stop) return 1;
+	if(ldr0 > ldr0_max)
+	{
+		if((snr0 > 0) && (snr0 < SNR0_MIN_STOP)) return 1;
+		if(light_state == LIGHT_GO)
+		{
+			if(ant_status[LEFT] || ant_status[RIGHT]) return 1;
+			return 0;
+		}
+	
+	}
+
+	return 0;
+}
+void task_ldr_start()
+{
+	Serial.print("Stopping ldr0:");
+	Serial.print(ldr0);
+	Serial.print(", snr0:");
+	Serial.print(snr0);
+	Serial.print(".");
+	
+	motors(0, 0);
+	stop = 1;
 }
 
 void set_tasks()
@@ -663,27 +774,23 @@ void set_tasks()
 	t.f_start = NULL;
 	t.f_trigger = task_evade_wall_trigger;
 	t.f_update = NULL;
-	t.prio = 4;
+	t.prio = 40;
 	t.state = 0;
 	t.id = TASK_EVADE_WALL;
 	task_add(&t);
+
+	t.f_start = task_ldr_start;
+	t.f_trigger = task_ldr_trigger;
+	t.f_update = NULL;
+	t.prio = 20;
+	t.state = 0;
+	t.id = TASK_LDR;
+	task_add(&t);
+
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-
-void setup()
+void config_ldr()
 {
-	pinMode(PIN_ANTL, INPUT);
-	pinMode(PIN_ANTR, INPUT);
-
-	Serial.begin(115200);
-	Serial.print("########### Starting arduino ###########\n");
-
-	odometry_init();
-	sonar_init();
-
-
 	do
 	{
 		update_ants();
@@ -701,12 +808,50 @@ void setup()
 	}
 	while(!ant_status[RIGHT]);
 
+	do
+	{
+		update_ants();
+		update_ldr();
+		ldr0_stop = ldr0;
+	}
+	while(!ant_status[LEFT]);
+
+	Serial.print("ldr0_stop:");
+	Serial.print(ldr0_stop);
+
+	do
+	{
+		update_ants();
+	}
+	while(!ant_status[RIGHT]);
+
 	delay(50);
 	do
 	{
 		update_ants();
 	}
 	while(ant_status[RIGHT]);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+void setup()
+{
+	pinMode(PIN_ANTL, INPUT);
+	pinMode(PIN_ANTR, INPUT);
+
+	Serial.begin(115200);
+	Serial.print("########### Starting arduino ###########\n");
+
+	odometry_init();
+	sonar_init();
+
+	do
+	{
+		update_ants();
+	}
+	while(!(ant_status[LEFT] || ant_status[RIGHT]));
+	if(ant_status[LEFT]) config_ldr();
 
 	set_tasks();
 	//task_go_forward();
