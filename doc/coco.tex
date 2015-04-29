@@ -1,5 +1,5 @@
 % Usar el tipo de documento: Artículo científico.
-\documentclass[10pt,a4paper,hidelinks,twocolumn]{article}
+\documentclass[10pt,a4paper,hidelinks,twocolumn,nobalancelastpage]{article}
 
 % Cargar mensajes en español.
 \usepackage[spanish,es-noquoting]{babel}
@@ -50,6 +50,9 @@
 % Dibujos geométricos
 \usepackage{tikz}
 \usetikzlibrary{through,calc,arrows,angles,babel}
+
+% No separar párrafos
+\interlinepenalty=100000
 
 % No separar mucho los párrafos
 %\setlength{\parskip}{0.5cm plus4mm minus3mm}
@@ -132,6 +135,8 @@ siguientes:
 	\item \texttt{mouse0}: Ratón de bola
 	\item \texttt{ldr0}: Sensor de luz LDR ambiental
 	\item \texttt{ldr1}: Sensor de luz LDR dirigido hacia delante
+	\item \texttt{antr}: Antena derecha
+	\item \texttt{antl}: Antena izquierda
 \end{enumerate}
 \subsection{Actuadores}
 El robot dispone de dos motores DC a ambos lados que le permiten moverse por el 
@@ -1242,5 +1247,73 @@ mejorar los cálculos de odometría.
 
 La última versión de este documento se encuentra en 
 \url{https://github.com/rodarima/robotica}.
-\clearpage
+\newpage
+
+\section{Detalles de los sensores}
+A continuación se muestran algunas fotos que muestran los sensores con detalle.
+
+\begin{figure}[H]
+\includegraphics[width=\columnwidth]{ants.jpg}
+\caption{Detalle del mecanismo de las antenas: En la izquierda desactivada; en
+la derecha activada. \label{fig:ants}}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[width=\columnwidth]{ldr0.jpg}
+\caption{Sensor de luz ambiental \texttt{ldr0}.  \label{fig:foto-ldr0}}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[width=\columnwidth]{ldr0-pieza.jpg}
+\caption{Construcción del sensor \texttt{ldr0}.  \label{fig:foto-ldr0-pieza}}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[width=\columnwidth]{ldr1.jpg}
+\caption{Sensor direccional \texttt{ldr1}, junto a los leds RGB para identificar 
+el color.  \label{fig:foto-ldr1}}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[width=\columnwidth]{bola.jpg}
+\caption{Se observa el interior del ratón de bola. Dos rodillos perpendiculares 
+en contacto con la bola, con discos dentados en los extremos. Una marca blanca 
+permite observar una desviación del robot. \label{fig:bola}}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[width=\columnwidth]{snr0.jpg}
+\caption{Sensor de ultrasonidos \texttt{snr0}. El emisor se encuentra a la 
+derecha (T) y el receptor a la izquierda (R). \label{fig:snr0}}
+\end{figure}
+%\newpage
+
+
+\section{Detalles del robot}
+Por último una visión general del robot.
+
+\begin{figure}[H]
+\includegraphics[width=\columnwidth]{motor.jpg}
+\caption{Se observa el mecanismo de engranajes que transmiten la rotación del 
+motor a las ruedas. \label{fig:motor}}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[width=\columnwidth]{bateria.jpg}
+\caption{Batería de $1.2 \cdot 8 = 9.6 \si{\V}$. Gracias al grupo GII por las 
+piezas. \label{fig:bateria}}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[width=\columnwidth]{coco.jpg}
+\caption{Vista superior del robot.  \label{fig:coco}}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[width=\columnwidth]{coco-abierto.jpg}
+\caption{Vista superior del robot desmontado.  \label{fig:coco-abierto}}
+\end{figure}
+\newpage
+%\clearpage
+
 \end{document}
