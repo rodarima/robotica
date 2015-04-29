@@ -34,7 +34,7 @@ float fw_start[2];
 #define TASK_LDR		5
 
 char ant_status[2];
-int ldr0, ldr1, ldr0_max = 800, ldr0_stop = 860;
+int ldr0, ldr1, ldr0_max = 480, ldr0_stop = 860;
 volatile int snr0;
 
 float fw_error[ERR_MAX];
@@ -852,6 +852,14 @@ void setup()
 	}
 	while(!(ant_status[LEFT] || ant_status[RIGHT]));
 	if(ant_status[LEFT]) config_ldr();
+
+	delay(100);
+	do
+	{
+		update_ants();
+	}
+	while((!ant_status[LEFT]) && (!ant_status[RIGHT]));
+	delay(100);
 
 	set_tasks();
 	//task_go_forward();
